@@ -1,17 +1,259 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K-Food Guide (New Start)</title>
+    <title>How to K-Food | Search Guide</title>
     <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-white flex items-center justify-center h-screen">
-    
-    <div class="text-center">
-        <h1 class="text-4xl font-bold text-gray-800 mb-4">🚧 공사 중 🚧</h1>
-        <p class="text-gray-500">여기서부터 다시 시작합니다!</p>
-    </div>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght @400;700&family=Poppins:wght @400;600;800&display=swap');
+        body { font-family: 'Poppins', 'Noto Sans KR', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        :root {
+            --bg-color: #f3f4f6;
+            --text-color: #1f2937;
+            --card-bg: #ffffff;
+            --nav-bg: #ffffff;
+        }
 
+        body.dark {
+            --bg-color: #1f2937;
+            --text-color: #f3f4f6;
+            --card-bg: #374151;
+            --nav-bg: #374151;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        nav {
+            background-color: var(--nav-bg);
+        }
+
+        article {
+            background-color: var(--card-bg);
+        }
+
+        #searchInput {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 min-h-screen">
+
+    <nav class="sticky top-0 z-50 bg-white shadow-md pb-4 pt-4 px-4 rounded-b-3xl">
+        <div class="max-w-2xl mx-auto">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center gap-2">
+                    <span class="text-3xl">🇰🇷</span>
+                    <div>
+                        <h1 class="text-xl font-extrabold text-gray-900 leading-none">How to K-Food</h1>
+                        <p class="text-xs text-gray-500 font-medium">Eat like a Local</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button id="dark-mode-toggle" class="text-gray-500 hover:text-red-500">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <div class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-bold">Beta</div>
+                </div>
+            </div>
+            <div class="relative">
+                <input type="text" id="searchInput" placeholder="Search food (e.g. Kimchi, BBQ...)" 
+                       class="w-full bg-gray-100 text-gray-900 rounded-2xl pl-12 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium transition shadow-inner">
+                <i class="fas fa-search absolute left-4 top-3.5 text-gray-400 text-lg"></i>
+            </div>
+            <div class="flex gap-2 mt-4 overflow-x-auto no-scrollbar" id="categoryContainer"></div>
+        </div>
+    </nav>
+
+    <main class="max-w-2xl mx-auto p-4 pb-20">
+        <div id="noResult" class="hidden text-center py-10">
+            <div class="text-6xl mb-4">😢</div>
+            <h3 class="text-lg font-bold text-gray-600">No food found</h3>
+            <p class="text-sm text-gray-400">Try searching for 'Rice' or 'Meat'</p>
+        </div>
+        <div id="foodList" class="space-y-6"></div>
+    </main>
+
+    <footer class="text-center py-6 text-gray-400 text-xs">
+        <p>© 2026 How to K-Food. Save your stomach.</p>
+    </footer>
+
+    <script>
+        // 1. 음식 데이터 (여기에 직접 넣었습니다)
+        const foodData = [
+            {
+                id: 1,
+                name: "Samgyeopsal",
+                koreanName: "삼겹살",
+                category: "BBQ",
+                desc: "Grilled Pork Belly. The soul food of Korea.",
+                image: "https://images.unsplash.com/photo-1595270966459-717db445037d?q=80&w=800&auto=format&fit=crop",
+                dont: "Don't eat only meat. Don't burn garlic.",
+                do: "Wrap meat, garlic, ssamjang in lettuce (Ssam). Eat in one bite.",
+                tip: "Fried Rice after meat is essential."
+            },
+            {
+                id: 2,
+                name: "Bibimbap",
+                koreanName: "비빔밥",
+                category: "Rice",
+                desc: "Mixed Rice with Vegetables and Gochujang.",
+                image: "https://images.unsplash.com/photo-1553163147-621957516d37?q=80&w=800&auto=format&fit=crop",
+                dont: "Don't eat toppings separately like a salad.",
+                do: "Add red paste and mix vigorously until red.",
+                tip: "Best choice for vegetarians (ask no beef)."
+            },
+            {
+                id: 3,
+                name: "Kimchi-jjigae",
+                koreanName: "김치찌개",
+                category: "Soup/Stew",
+                desc: "Spicy stew made with fermented Kimchi and pork.",
+                image: "https://images.unsplash.com/photo-1583561958223-958b4b7405e6?q=80&w=800&auto=format&fit=crop",
+                dont: "Don't just sip the broth like tea. Eat the meat too.",
+                do: "Mix broth and meat with rice. Use Gim (seaweed).",
+                tip: "Add 'Ramen Noodles' (Ramyeon-sari) for perfection."
+            },
+            {
+                id: 4,
+                name: "Tteokbokki",
+                koreanName: "떡볶이",
+                category: "Street Food",
+                desc: "Spicy Rice Cake. The king of street food.",
+                image: "https://images.unsplash.com/photo-1583267746897-2cf415887172?q=80&w=800&auto=format&fit=crop",
+                dont: "Don't throw away the sauce.",
+                do: "Dip 'Fried Food' (Twigim) in the sauce.",
+                tip: "Try 'Rose Tteokbokki' if you can't eat spicy food."
+            },
+            {
+                id: 5,
+                name: "Jajangmyeon",
+                koreanName: "자장면",
+                category: "Noodle",
+                desc: "Noodles in black bean sauce. Delivery favorite.",
+                image: "https://images.unsplash.com/photo-1628751505370-13f591f24d78?q=80&w=800&auto=format&fit=crop",
+                dont: "Don't eat sauce and noodles separately.",
+                do: "Mix hard until you can't see white noodles.",
+                tip: "Eat yellow radish (Danmuji) together."
+            }
+        ];
+
+        // 2. 화면 그리기 로직
+        const searchInput = document.getElementById('searchInput');
+        const foodList = document.getElementById('foodList');
+        const categoryContainer = document.getElementById('categoryContainer');
+        const noResult = document.getElementById('noResult');
+        const categories = ['All', ...new Set(foodData.map(item => item.category))];
+        
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+
+        // Dark Mode Toggle
+        darkModeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            const isDarkMode = document.body.classList.contains('dark');
+            localStorage.setItem('darkMode', isDarkMode);
+            updateDarkModeIcon(isDarkMode);
+        });
+
+        function updateDarkModeIcon(isDarkMode) {
+            if (isDarkMode) {
+                darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        }
+
+        function loadDarkModePreference() {
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+            if (isDarkMode) {
+                document.body.classList.add('dark');
+            }
+            updateDarkModeIcon(isDarkMode);
+        }
+
+        loadDarkModePreference();
+        
+        // 카테고리 버튼 생성
+        categories.forEach(cat => {
+            const btn = document.createElement('button');
+            btn.className = `px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition ${cat === 'All' ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`;
+            btn.innerText = cat;
+            btn.onclick = () => filterByCategory(cat, btn);
+            categoryContainer.appendChild(btn);
+        });
+
+        renderFoods(foodData);
+
+        // 검색
+        searchInput.addEventListener('input', (e) => {
+            const keyword = e.target.value.toLowerCase();
+            const filtered = foodData.filter(food => 
+                food.name.toLowerCase().includes(keyword) || 
+                food.koreanName.includes(keyword) ||
+                food.desc.toLowerCase().includes(keyword)
+            );
+            renderFoods(filtered);
+        });
+
+        // 필터
+        function filterByCategory(category, clickedBtn) {
+            Array.from(categoryContainer.children).forEach(b => {
+                b.className = 'px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition bg-gray-200 text-gray-500 hover:bg-gray-300';
+            });
+            clickedBtn.className = 'px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition bg-red-600 text-white shadow-md';
+            if (category === 'All') renderFoods(foodData);
+            else renderFoods(foodData.filter(food => food.category === category));
+        }
+
+        // 렌더링
+        function renderFoods(data) {
+            foodList.innerHTML = '';
+            if (data.length === 0) {
+                noResult.classList.remove('hidden');
+                return;
+            } else {
+                noResult.classList.add('hidden');
+            }
+            data.forEach(food => {
+                const card = `
+                    <article class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition duration-300">
+                        <div class="relative h-56">
+                            <img src="${food.image}" alt="${food.name}" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                            <div class="absolute bottom-4 left-4 text-white">
+                                <h2 class="text-2xl font-bold">${food.name}</h2>
+                                <p class="text-sm opacity-90">${food.koreanName} • ${food.category}</p>
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <p class="text-gray-600 mb-4 text-sm leading-relaxed">${food.desc}</p>
+                            <div class="grid grid-cols-1 gap-3">
+                                <div class="bg-red-50 p-3 rounded-xl border border-red-100 flex gap-3 items-start">
+                                    <div class="bg-red-100 text-red-600 p-1.5 rounded-full shrink-0 mt-0.5"><i class="fas fa-times text-xs"></i></div>
+                                    <div><span class="block text-xs font-bold text-red-500 uppercase tracking-wide">Don't</span><p class="text-sm text-gray-700 font-medium">${food.dont}</p></div>
+                                </div>
+                                <div class="bg-green-50 p-3 rounded-xl border border-green-100 flex gap-3 items-start">
+                                    <div class="bg-green-100 text-green-600 p-1.5 rounded-full shrink-0 mt-0.5"><i class="fas fa-check text-xs"></i></div>
+                                    <div><span class="block text-xs font-bold text-green-600 uppercase tracking-wide">Do This</span><p class="text-sm text-gray-700 font-medium">${food.do}</p></div>
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-gray-100 flex items-center gap-2 text-yellow-600 text-sm">
+                                <i class="fas fa-lightbulb"></i><span class="font-bold text-xs bg-yellow-100 px-2 py-0.5 rounded">TIP</span><span class="text-gray-500 text-xs">${food.tip}</span>
+                            </div>
+                        </div>
+                    </article>
+                `;
+                foodList.innerHTML += card;
+            });
+        }
+    </script>
 </body>
 </html>
