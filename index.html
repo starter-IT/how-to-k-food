@@ -3,259 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>How to K-Food | Search Guide</title>
+    <title>K-Food Rescue Guide</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Poppins:wght@400;600;800&display=swap');
-        body { font-family: 'Poppins', 'Noto Sans KR', sans-serif; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        .modal-overlay {
-            transition: opacity 0.3s ease;
+        body {
+            background-color: #FDFBF7;
+            font-family: 'Poppins', 'Pretendard', sans-serif;
         }
-        .modal-container {
-            transition: transform 0.3s ease;
+        .modal {
+            transition: opacity 0.25s ease;
+        }
+        .modal-content {
+            transition: transform 0.25s ease;
         }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800 min-h-screen">
+<body class="min-h-screen">
 
-    <nav class="sticky top-0 z-40 bg-white shadow-md pb-4 pt-4 px-4 rounded-b-3xl">
-        <div class="max-w-2xl mx-auto">
-            <div class="flex justify-between items-center mb-4">
-                <div class="flex items-center gap-2">
-                    <span class="text-3xl">🇰🇷</span>
-                    <div>
-                        <h1 class="text-xl font-extrabold text-gray-900 leading-none">How to K-Food</h1>
-                        <p class="text-xs text-gray-500 font-medium">Eat like a Local</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4">
-                    <button id="dark-mode-toggle" class="text-gray-500 hover:text-red-500">
-                        <i class="fas fa-moon"></i>
-                    </button>
-                    <div class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-bold">Beta</div>
-                </div>
-            </div>
+    <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-lg shadow-sm p-4">
+        <div class="max-w-3xl mx-auto">
             <div class="relative">
-                <input type="text" id="searchInput" placeholder="Search food (e.g. Kimchi, BBQ...)" 
-                       class="w-full bg-gray-100 text-gray-900 rounded-2xl pl-12 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium transition shadow-inner">
-                <i class="fas fa-search absolute left-4 top-3.5 text-gray-400 text-lg"></i>
+                <input type="text" id="searchInput" placeholder="Search food (e.g. Bibimbap...)"
+                       class="w-full bg-gray-100 text-gray-800 rounded-full pl-12 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 font-semibold shadow-inner">
+                <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400"></i>
             </div>
-            <div class="flex gap-2 mt-4 overflow-x-auto no-scrollbar" id="categoryContainer"></div>
+            <div id="categoryContainer" class="flex gap-2 mt-3 overflow-x-auto" style="scrollbar-width: none; -ms-overflow-style: none; &::-webkit-scrollbar { display: none; }">
+                <!-- Category buttons will be injected here -->
+            </div>
         </div>
-    </nav>
+    </header>
 
-    <main class="max-w-2xl mx-auto p-4 pb-20">
-        <div id="noResult" class="hidden text-center py-10">
-            <div class="text-6xl mb-4">😢</div>
-            <h3 class="text-lg font-bold text-gray-600">No food found</h3>
-            <p class="text-sm text-gray-400">Try searching for 'Rice' or 'Meat'</p>
+    <main class="max-w-3xl mx-auto p-4">
+        <div id="foodList" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <!-- Food cards will be injected here -->
         </div>
-        <div id="foodList" class="grid grid-cols-2 md:grid-cols-3 gap-4"></div>
     </main>
 
-    <!-- Modal -->
-    <div id="foodModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay bg-black bg-opacity-50 opacity-0 pointer-events-none">
-        <div class="bg-white rounded-3xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 modal-container transform scale-95">
-            <!-- Modal Content will be injected here -->
+    <div id="foodModal" class="fixed inset-0 z-50 p-4 flex items-center justify-center bg-black/60 opacity-0 pointer-events-none modal">
+        <div id="modalContent" class="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto modal-content transform scale-95">
+            <!-- Modal content will be injected here -->
         </div>
     </div>
 
-    <footer class="text-center py-6 text-gray-400 text-xs">
-        <p>© 2026 How to K-Food. Save your stomach.</p>
-    </footer>
-
+    <script src="foods.js"></script>
     <script>
-        // 1. 음식 데이터
-        const foodData = [
-            {
-                id: 1,
-                name: "Samgyeopsal",
-                koreanName: "삼겹살",
-                category: "BBQ",
-                desc: "Grilled Pork Belly. The soul food of Korea.",
-                image: "https://images.unsplash.com/photo-1595270966459-717db445037d?q=80&w=800&auto=format&fit=crop",
-                dont: "Don't eat only meat. Don't burn garlic.",
-                do: "Wrap meat, garlic, ssamjang in lettuce (Ssam). Eat in one bite.",
-                tip: "Fried Rice after meat is essential."
-            },
-            {
-                id: 2,
-                name: "Bibimbap",
-                koreanName: "비빔밥",
-                category: "Rice",
-                desc: "Mixed Rice with Vegetables and Gochujang.",
-                image: "https://lh3.googleusercontent.com/gg-dl/AOI_d_-eAmJfOHarMlWLmgzvooYnF7o-W5WcvJWWtB-Yfg8OUfhQ17M8VZxMz0InL_BGMdG4YB-s6zf1v8PPvyexzNpTjZpl8VpgbgnZVZ1T4mQ3HocaLHf7E_7ni43sn0xC3jwwUbfx781pf553hxGw7rDHNG1Yw5kHb1YDdNcoNTfbDUlSgg=s1040-rj",
-                dont: "Don't eat toppings separately like a salad.",
-                do: "Add red paste and mix vigorously until red.",
-                tip: "Best choice for vegetarians (ask no beef)."
-            },
-            {
-                id: 3,
-                name: "Kimchi-jjigae",
-                koreanName: "김치찌개",
-                category: "Soup/Stew",
-                desc: "Spicy stew made with fermented Kimchi and pork.",
-                image: "https://images.unsplash.com/photo-1583561958223-958b4b7405e6?q=80&w=800&auto=format&fit=crop",
-                dont: "Don't just sip the broth like tea. Eat the meat too.",
-                do: "Mix broth and meat with rice. Use Gim (seaweed).",
-                tip: "Add 'Ramen Noodles' (Ramyeon-sari) for perfection."
-            },
-            {
-                id: 4,
-                name: "Tteokbokki",
-                koreanName: "떡볶이",
-                category: "Street Food",
-                desc: "Spicy Rice Cake. The king of street food.",
-                image: "https://images.unsplash.com/photo-1583267746897-2cf415887172?q=80&w=800&auto=format&fit=crop",
-                dont: "Don't throw away the sauce.",
-                do: "Dip 'Fried Food' (Twigim) in the sauce.",
-                tip: "Try 'Rose Tteokbokki' if you can't eat spicy food."
-            },
-            {
-                id: 5,
-                name: "Jajangmyeon",
-                koreanName: "자장면",
-                category: "Noodle",
-                desc: "Noodles in black bean sauce. Delivery favorite.",
-                image: "https://images.unsplash.com/photo-1628751505370-13f591f24d78?q=80&w=800&auto=format&fit=crop",
-                dont: "Don't eat sauce and noodles separately.",
-                do: "Mix hard until you can't see white noodles.",
-                tip: "Eat yellow radish (Danmuji) together."
-            }
-        ];
+        document.addEventListener('DOMContentLoaded', () => {
+            const foodList = document.getElementById('foodList');
+            const searchInput = document.getElementById('searchInput');
+            const categoryContainer = document.getElementById('categoryContainer');
+            const modal = document.getElementById('foodModal');
+            const modalContent = document.getElementById('modalContent');
 
-        // 2. 화면 그리기 및 모달 로직
-        const searchInput = document.getElementById('searchInput');
-        const foodList = document.getElementById('foodList');
-        const categoryContainer = document.getElementById('categoryContainer');
-        const noResult = document.getElementById('noResult');
-        const modal = document.getElementById('foodModal');
-        const modalContainer = modal.querySelector('.modal-container');
+            const allCategories = ['All', ...new Set(foodData.map(food => food.category.name))];
 
-        const categories = ['All', ...new Set(foodData.map(item => item.category))];
-        
-        categories.forEach(cat => {
-            const btn = document.createElement('button');
-            btn.className = `px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition ${cat === 'All' ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`;
-            btn.innerText = cat;
-            btn.onclick = () => filterByCategory(cat, btn);
-            categoryContainer.appendChild(btn);
-        });
-
-        renderFoods(foodData);
-
-        searchInput.addEventListener('input', (e) => {
-            const keyword = e.target.value.toLowerCase();
-            const filtered = foodData.filter(food => 
-                food.name.toLowerCase().includes(keyword) || 
-                food.koreanName.includes(keyword) ||
-                food.desc.toLowerCase().includes(keyword)
-            );
-            renderFoods(filtered);
-        });
-
-        function filterByCategory(category, clickedBtn) {
-            Array.from(categoryContainer.children).forEach(b => {
-                b.className = 'px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition bg-gray-200 text-gray-500 hover:bg-gray-300';
+            // Render category buttons
+            allCategories.forEach(categoryName => {
+                const food = foodData.find(f => f.category.name === categoryName);
+                const icon = food ? food.category.icon : '🍴';
+                const button = document.createElement('button');
+                button.className = `category-btn whitespace-nowrap px-4 py-1.5 text-sm font-bold rounded-full transition-colors duration-300 ${categoryName === 'All' ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-600'}`;
+                button.textContent = `${icon} ${categoryName}`;
+                button.dataset.category = categoryName;
+                categoryContainer.appendChild(button);
             });
-            clickedBtn.className = 'px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition bg-red-600 text-white shadow-md';
-            if (category === 'All') renderFoods(foodData);
-            else renderFoods(foodData.filter(food => food.category === category));
-        }
 
-        function renderFoods(data) {
-            foodList.innerHTML = '';
-            noResult.classList.toggle('hidden', data.length > 0);
-            
-            data.forEach(food => {
-                const card = document.createElement('article');
-                card.className = 'bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-lg transition duration-300';
-                card.innerHTML = `
-                    <div class="relative h-40">
-                        <img src="${food.image}" alt="${food.name}" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+            const renderFoods = (filterFn = () => true) => {
+                foodList.innerHTML = '';
+                const filteredFoods = foodData.filter(filterFn);
+                filteredFoods.forEach(food => {
+                    const card = document.createElement('div');
+                    card.className = 'relative rounded-2xl overflow-hidden shadow-sm cursor-pointer aspect-square group';
+                    card.innerHTML = `
+                        <img src="${food.image}" alt="${food.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                        <h3 class="absolute bottom-3 left-4 text-white font-bold text-lg">${food.name}</h3>
+                    `;
+                    card.addEventListener('click', () => openModal(food));
+                    foodList.appendChild(card);
+                });
+            };
+
+            const openModal = (food) => {
+                modalContent.innerHTML = `
+                    <div class="relative">
+                        <img src="${food.image}" alt="${food.name}" class="w-full h-56 object-cover rounded-t-2xl">
+                        <button id="closeModalBtn" class="absolute top-3 right-3 bg-black/40 text-white w-8 h-8 rounded-full hover:bg-red-500 transition-colors">&times;</button>
                     </div>
-                    <div class="p-3">
-                        <h2 class="font-bold text-gray-800">${food.name}</h2>
-                        <p class="text-xs text-gray-500">${food.koreanName}</p>
+                    <div class="p-6">
+                        <div class="flex items-baseline gap-2">
+                            <h2 class="text-3xl font-extrabold">${food.name}</h2>
+                            <p class="text-gray-500 font-semibold">${food.koreanName}</p>
+                        </div>
+                        <p class="text-gray-600 mt-2">${food.howToEat}</p>
+                        
+                        <div class="mt-6 space-y-3">
+                            <div class="bg-green-50 text-green-800 p-4 rounded-xl border-l-4 border-green-400">
+                                <h3 class="font-bold text-sm flex items-center gap-2"><i class="fas fa-check-circle"></i> DO THIS</h3>
+                                <p class="mt-1 text-sm font-medium">${food.do}</p>
+                            </div>
+                            <div class="bg-red-50 text-red-800 p-4 rounded-xl border-l-4 border-red-400">
+                                <h3 class="font-bold text-sm flex items-center gap-2"><i class="fas fa-times-circle"></i> NEVER DO THIS</h3>
+                                <p class="mt-1 text-sm font-medium">${food.dont}</p>
+                            </div>
+                            <div class="bg-yellow-50 text-yellow-800 p-4 rounded-xl border-l-4 border-yellow-400">
+                                <h3 class="font-bold text-sm flex items-center gap-2"><i class="fas fa-lightbulb"></i> PRO TIP</h3>
+                                <p class="mt-1 text-sm font-medium">${food.proTip}</p>
+                            </div>
+                        </div>
                     </div>
                 `;
-                card.addEventListener('click', () => openModal(food));
-                foodList.appendChild(card);
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                modalContent.classList.remove('scale-95');
+                document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+            };
+
+            const closeModal = () => {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                modalContent.classList.add('scale-95');
+            };
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
             });
-        }
 
-        function openModal(food) {
-            modalContainer.innerHTML = `
-                <div class="relative">
-                    <img src="${food.image}" class="w-full h-60 object-cover rounded-2xl mb-4">
-                    <div class="absolute top-4 right-4 bg-black/50 text-white text-xs px-2 py-1 rounded-full">${food.category}</div>
-                    <button id="closeModal" class="absolute top-4 left-4 bg-black/50 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-500 transition">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <h2 class="text-3xl font-extrabold mb-1">${food.name} <span class="font-normal text-xl text-gray-500">${food.koreanName}</span></h2>
-                <p class="text-gray-600 mb-6">${food.desc}</p>
-                
-                <div class="space-y-4">
-                    <div class="bg-red-50 p-4 rounded-xl">
-                        <h3 class="font-bold text-red-600 mb-2"><i class="fas fa-times-circle mr-2"></i>DON'T</h3>
-                        <p class="text-gray-700 font-medium">${food.dont}</p>
-                    </div>
-                    <div class="bg-green-50 p-4 rounded-xl">
-                        <h3 class="font-bold text-green-600 mb-2"><i class="fas fa-check-circle mr-2"></i>DO</h3>
-                        <p class="text-gray-700 font-medium">${food.do}</p>
-                    </div>
-                    <div class="bg-yellow-50 p-4 rounded-xl">
-                        <h3 class="font-bold text-yellow-600 mb-2"><i class="fas fa-lightbulb mr-2"></i>TIP</h3>
-                        <p class="text-gray-700 font-medium">${food.tip}</p>
-                    </div>
-                </div>
-            `;
-            
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-            modalContainer.classList.remove('scale-95');
+            searchInput.addEventListener('input', (e) => {
+                const keyword = e.target.value.toLowerCase();
+                renderFoods(food =>
+                    food.name.toLowerCase().includes(keyword) ||
+                    food.koreanName.toLowerCase().includes(keyword) ||
+                    food.category.name.toLowerCase().includes(keyword)
+                );
+            });
 
-            modal.querySelector('#closeModal').addEventListener('click', closeModal);
-        }
+            categoryContainer.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    const category = e.target.dataset.category;
+                    document.querySelectorAll('.category-btn').forEach(btn => {
+                        btn.classList.remove('bg-red-500', 'text-white');
+                        btn.classList.add('bg-gray-200', 'text-gray-600');
+                    });
+                    e.target.classList.add('bg-red-500', 'text-white');
+                    e.target.classList.remove('bg-gray-200', 'text-gray-600');
+                    
+                    if (category === 'All') {
+                        renderFoods();
+                    } else {
+                        renderFoods(food => food.category.name === category);
+                    }
+                }
+            });
 
-        function closeModal() {
-            modal.classList.add('opacity-0', 'pointer-events-none');
-            modalContainer.classList.add('scale-95');
-        }
-
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeModal();
-            }
+            renderFoods();
         });
-
-        // Dark Mode
-        const darkModeToggle = document.getElementById('dark-mode-toggle');
-        const isDarkMode = () => localStorage.getItem('darkMode') === 'true';
-
-        const setDarkMode = (isDark) => {
-            if (isDark) {
-                document.documentElement.classList.add('dark');
-                darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-            } else {
-                document.documentElement.classList.remove('dark');
-                darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-            }
-        }
-        
-        darkModeToggle.addEventListener('click', () => {
-            const newIsDark = !isDarkMode();
-            localStorage.setItem('darkMode', newIsDark);
-            setDarkMode(newIsDark);
-        });
-
-        // Load theme on init
-        setDarkMode(isDarkMode());
     </script>
 </body>
 </html>
