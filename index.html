@@ -1,60 +1,159 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>How to K-Food: 한국 음식 맛있게 즐기기</title>
-    <link rel="stylesheet" href="style.css">
+    <title>How to K-Food | Eat Like a Local</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Poppins:wght@400;600;800&display=swap');
+        body { font-family: 'Poppins', 'Noto Sans KR', sans-serif; }
+    </style>
 </head>
-<body>
-    <header>
-        <h1>How to K-Food: 한국 음식 맛있게 즐기기</h1>
-        <p>한국 여행 중 음식을 더욱 맛있고 올바르게 즐기는 방법을 알려드립니다!</p>
-        <button id="theme-toggle">다크 모드</button>
+<body class="bg-gray-50 text-gray-800">
+
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <span class="text-2xl">🇰🇷</span>
+                <h1 class="text-xl font-extrabold tracking-tight text-red-600">How to K-Food</h1>
+            </div>
+            <button class="text-gray-500 hover:text-red-600">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+    </nav>
+
+    <header class="bg-red-50 py-12 px-4 text-center">
+        <h2 class="text-3xl md:text-4xl font-extrabold mb-3 text-gray-900">
+            Don't Eat It Wrong! 🙅‍♂️
+        </h2>
+        <p class="text-gray-600 max-w-md mx-auto mb-6">
+            Are you eating Samgyeopsal with a fork? <br>
+            Stop acting like a tourist. Eat like a BOSS.
+        </p>
+        <div class="flex gap-2 justify-center flex-wrap">
+            <span class="bg-white px-3 py-1 rounded-full text-sm shadow-sm text-red-500 font-bold">#Spicy</span>
+            <span class="bg-white px-3 py-1 rounded-full text-sm shadow-sm text-orange-500 font-bold">#StreetFood</span>
+            <span class="bg-white px-3 py-1 rounded-full text-sm shadow-sm text-green-600 font-bold">#LocalVibe</span>
+        </div>
     </header>
 
-    <main>
-        <section id="bibimbap">
-            <h2>비빔밥 (Bibimbap)</h2>
-            <div class="food-guide">
-                <img src="https://via.placeholder.com/400x250?text=Bibimbap" alt="비빔밥">
-                <h3>🍲 맛있게 비벼 먹는 방법</h3>
-                <p>
-                    비빔밥은 밥 위에 다양한 나물과 고기, 계란 프라이, 고추장 등을 올려 비벼 먹는 음식입니다.
-                    가장 중요한 것은 <strong>모든 재료를 고루고루 잘 비벼서</strong> 한 입에 다양한 맛과 식감을 느낄 수 있도록 하는 것입니다.
-                </p>
-                <ul>
-                    <li>숟가락으로 밥과 나물, 고추장을 크게 한 덩어리 퍼서 섞어주세요.</li>
-                    <li>너무 조심스럽게 비비지 말고, 과감하게 큰 숟가락으로 꾹꾹 눌러가며 비벼주세요!</li>
-                    <li>따뜻할 때 바로 비벼 먹는 것이 가장 맛있습니다.</li>
-                    <li>고추장 양은 개인의 기호에 따라 조절하시면 됩니다.</li>
-                </ul>
-            </div>
-        </section>
+    <main class="max-w-4xl mx-auto px-4 py-10 space-y-8">
 
-        <section id="kimchi-jjigae">
-            <h2>김치찌개 (Kimchi Jjigae)</h2>
-            <div class="food-guide">
-                <img src="https://via.placeholder.com/400x250?text=Kimchi+Jjigae" alt="김치찌개">
-                <h3>🌶️ 뜨겁게 즐기는 방법</h3>
-                <p>
-                    김치찌개는 잘 익은 김치로 끓인 한국인의 소울푸드입니다. 뜨겁게 끓여 나온 찌개를 밥과 함께 먹는 것이 일반적입니다.
-                </p>
-                <ul>
-                    <li>찌개는 개인 접시에 덜어 먹기보다는, 여럿이 함께 큰 냄비에서 떠 먹는 것이 일반적인 식사 문화입니다.</li>
-                    <li>밥과 함께 국물을 적시고, 건더기를 얹어 드세요.</li>
-                    <li>김치찌개는 식으면서 맛이 변할 수 있으니, 따뜻하게 데워가며 드시면 좋습니다.</li>
-                </ul>
+        <article class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+            <div class="relative h-64">
+                <img src="https://images.unsplash.com/photo-1595270966459-717db445037d?q=80&w=800&auto=format&fit=crop" alt="Samgyeopsal" class="w-full h-full object-cover">
+                <div class="absolute bottom-0 left-0 bg-gradient-to-t from-black/70 to-transparent w-full p-4">
+                    <h3 class="text-white text-2xl font-bold">Samgyeopsal <span class="text-sm font-normal opacity-80">(삼겹살)</span></h3>
+                    <p class="text-gray-200 text-xs mt-1">Grilled Pork Belly BBQ</p>
+                </div>
             </div>
-        </section>
+            <div class="p-6">
+                <div class="mb-4 bg-red-50 p-4 rounded-xl border-l-4 border-red-500">
+                    <h4 class="font-bold text-red-600 mb-1"><i class="fas fa-times-circle"></i> Don't do this</h4>
+                    <p class="text-sm text-gray-600">Don't just eat the meat with a fork. And <span class="font-bold">never burn the garlic!</span></p>
+                </div>
+                <div class="bg-green-50 p-4 rounded-xl border-l-4 border-green-500">
+                    <h4 class="font-bold text-green-700 mb-1"><i class="fas fa-check-circle"></i> The "SSAM" Technique</h4>
+                    <p class="text-sm text-gray-700 font-medium">Lettuce + Meat + Garlic + <span class="text-orange-600 font-bold">Ssamjang (Brown sauce)</span>. Wrap it into a ball and eat it in ONE bite.</p>
+                </div>
+                <div class="mt-4 p-3 bg-yellow-50 rounded-lg text-sm text-yellow-800">
+                    <i class="fas fa-lightbulb text-yellow-500"></i> <strong>Local Tip:</strong> Finish with 'Fried Rice' on the grill. It's the dessert.
+                </div>
+            </div>
+        </article>
 
-        <!-- 다른 음식 섹션을 여기에 추가할 수 있습니다. -->
+        <article class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+            <div class="relative h-64">
+                <img src="https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=800&auto=format&fit=crop" alt="Korean Fried Chicken" class="w-full h-full object-cover">
+                <div class="absolute bottom-0 left-0 bg-gradient-to-t from-black/70 to-transparent w-full p-4">
+                    <h3 class="text-white text-2xl font-bold">Chimaek <span class="text-sm font-normal opacity-80">(치맥)</span></h3>
+                    <p class="text-gray-200 text-xs mt-1">Fried Chicken & Beer</p>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="mb-4 bg-red-50 p-4 rounded-xl border-l-4 border-red-500">
+                    <h4 class="font-bold text-red-600 mb-1"><i class="fas fa-times-circle"></i> Don't do this</h4>
+                    <p class="text-sm text-gray-600">Don't use a knife and fork elegantly. Don't drink the water from the radish cube container.</p>
+                </div>
+                <div class="bg-green-50 p-4 rounded-xl border-l-4 border-green-500">
+                    <h4 class="font-bold text-green-700 mb-1"><i class="fas fa-check-circle"></i> Use Your Hands</h4>
+                    <p class="text-sm text-gray-700 font-medium">Use the mini-tongs or ask for plastic gloves. If you can't decide, order <span class="font-bold">"Ban-Ban" (Half & Half)</span>.</p>
+                </div>
+            </div>
+        </article>
+
+        <article class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+            <div class="relative h-64">
+                <img src="https://images.unsplash.com/photo-1628751505370-13f591f24d78?q=80&w=800&auto=format&fit=crop" alt="Jajangmyeon" class="w-full h-full object-cover">
+                <div class="absolute bottom-0 left-0 bg-gradient-to-t from-black/70 to-transparent w-full p-4">
+                    <h3 class="text-white text-2xl font-bold">Jajangmyeon <span class="text-sm font-normal opacity-80">(자장면)</span></h3>
+                    <p class="text-gray-200 text-xs mt-1">Black Bean Noodles</p>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="mb-4 bg-red-50 p-4 rounded-xl border-l-4 border-red-500">
+                    <h4 class="font-bold text-red-600 mb-1"><i class="fas fa-times-circle"></i> Don't do this</h4>
+                    <p class="text-sm text-gray-600">Don't eat the sauce and noodles separately. Don't try to be quiet.</p>
+                </div>
+                <div class="bg-green-50 p-4 rounded-xl border-l-4 border-green-500">
+                    <h4 class="font-bold text-green-700 mb-1"><i class="fas fa-check-circle"></i> Mix It Hard!</h4>
+                    <p class="text-sm text-gray-700 font-medium">Mix with two hands until you can't see white noodles. Eat yellow radish (Danmuji) as a palate cleanser.</p>
+                </div>
+                 <div class="mt-4 p-3 bg-yellow-50 rounded-lg text-sm text-yellow-800">
+                    <i class="fas fa-lightbulb text-yellow-500"></i> <strong>Local Tip:</strong> Sprinkle some "Red pepper powder" if it feels greasy.
+                </div>
+            </div>
+        </article>
+
+        <article class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+            <div class="relative h-64">
+                <img src="https://images.unsplash.com/photo-1583561958223-958b4b7405e6?q=80&w=800&auto=format&fit=crop" alt="Kimchi Stew" class="w-full h-full object-cover">
+                <div class="absolute bottom-0 left-0 bg-gradient-to-t from-black/70 to-transparent w-full p-4">
+                    <h3 class="text-white text-2xl font-bold">Kimchi-jjigae <span class="text-sm font-normal opacity-80">(김치찌개)</span></h3>
+                    <p class="text-gray-200 text-xs mt-1">Spicy Kimchi Stew</p>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="mb-4 bg-red-50 p-4 rounded-xl border-l-4 border-red-500">
+                    <h4 class="font-bold text-red-600 mb-1"><i class="fas fa-times-circle"></i> Don't do this</h4>
+                    <p class="text-sm text-gray-600">Don't just sip the broth like tea. Don't leave the pork and kimchi behind.</p>
+                </div>
+                <div class="bg-green-50 p-4 rounded-xl border-l-4 border-green-500">
+                    <h4 class="font-bold text-green-700 mb-1"><i class="fas fa-check-circle"></i> Mix with Rice</h4>
+                    <p class="text-sm text-gray-700 font-medium">Scoop a generous amount of stew onto your rice and mix. Use dried seaweed (Gim) to wrap the rice.</p>
+                </div>
+            </div>
+        </article>
+
+        <article class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+            <div class="relative h-64">
+                <img src="https://images.unsplash.com/photo-1580651315530-69c8e0026377?q=80&w=800&auto=format&fit=crop" alt="Fish Cake" class="w-full h-full object-cover">
+                <div class="absolute bottom-0 left-0 bg-gradient-to-t from-black/70 to-transparent w-full p-4">
+                    <h3 class="text-white text-2xl font-bold">Eomuk <span class="text-sm font-normal opacity-80">(어묵)</span></h3>
+                    <p class="text-gray-200 text-xs mt-1">Street Fish Cake</p>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="mb-4 bg-red-50 p-4 rounded-xl border-l-4 border-red-500">
+                    <h4 class="font-bold text-red-600 mb-1"><i class="fas fa-times-circle"></i> Don't do this</h4>
+                    <p class="text-sm text-gray-600">Don't pour soy sauce over the whole stick. Don't double-dip if sharing sauce.</p>
+                </div>
+                <div class="bg-green-50 p-4 rounded-xl border-l-4 border-green-500">
+                    <h4 class="font-bold text-green-700 mb-1"><i class="fas fa-check-circle"></i> Free Soup!</h4>
+                    <p class="text-sm text-gray-700 font-medium">Brush soy sauce lightly. The broth in the cup is <span class="font-bold text-green-600">100% FREE</span> and unlimited!</p>
+                </div>
+            </div>
+        </article>
+
     </main>
 
-    <footer>
-        <p>&copy; 2026 How to K-Food. All rights reserved.</p>
+    <footer class="bg-gray-100 py-8 text-center border-t">
+        <p class="text-gray-500 mb-2">Made with ❤️ in Korea</p>
+        <p class="text-xs text-gray-400">&copy; 2026 How to K-Food. No login required.</p>
     </footer>
 
-    <script src="main.js"></script>
 </body>
 </html>
