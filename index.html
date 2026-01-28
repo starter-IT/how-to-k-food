@@ -7,47 +7,22 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght @400;700&family=Poppins:wght @400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Poppins:wght@400;600;800&display=swap');
         body { font-family: 'Poppins', 'Noto Sans KR', sans-serif; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        :root {
-            --bg-color: #f3f4f6;
-            --text-color: #1f2937;
-            --card-bg: #ffffff;
-            --nav-bg: #ffffff;
-        }
 
-        body.dark {
-            --bg-color: #1f2937;
-            --text-color: #f3f4f6;
-            --card-bg: #374151;
-            --nav-bg: #374151;
+        .modal-overlay {
+            transition: opacity 0.3s ease;
         }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-        }
-
-        nav {
-            background-color: var(--nav-bg);
-        }
-
-        article {
-            background-color: var(--card-bg);
-        }
-
-        #searchInput {
-            background-color: var(--bg-color);
-            color: var(--text-color);
+        .modal-container {
+            transition: transform 0.3s ease;
         }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800 min-h-screen">
 
-    <nav class="sticky top-0 z-50 bg-white shadow-md pb-4 pt-4 px-4 rounded-b-3xl">
+    <nav class="sticky top-0 z-40 bg-white shadow-md pb-4 pt-4 px-4 rounded-b-3xl">
         <div class="max-w-2xl mx-auto">
             <div class="flex justify-between items-center mb-4">
                 <div class="flex items-center gap-2">
@@ -79,15 +54,22 @@
             <h3 class="text-lg font-bold text-gray-600">No food found</h3>
             <p class="text-sm text-gray-400">Try searching for 'Rice' or 'Meat'</p>
         </div>
-        <div id="foodList" class="space-y-6"></div>
+        <div id="foodList" class="grid grid-cols-2 md:grid-cols-3 gap-4"></div>
     </main>
+
+    <!-- Modal -->
+    <div id="foodModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay bg-black bg-opacity-50 opacity-0 pointer-events-none">
+        <div class="bg-white rounded-3xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 modal-container transform scale-95">
+            <!-- Modal Content will be injected here -->
+        </div>
+    </div>
 
     <footer class="text-center py-6 text-gray-400 text-xs">
         <p>© 2026 How to K-Food. Save your stomach.</p>
     </footer>
 
     <script>
-        // 1. 음식 데이터 (여기에 직접 넣었습니다)
+        // 1. 음식 데이터
         const foodData = [
             {
                 id: 1,
@@ -146,42 +128,16 @@
             }
         ];
 
-        // 2. 화면 그리기 로직
+        // 2. 화면 그리기 및 모달 로직
         const searchInput = document.getElementById('searchInput');
         const foodList = document.getElementById('foodList');
         const categoryContainer = document.getElementById('categoryContainer');
         const noResult = document.getElementById('noResult');
+        const modal = document.getElementById('foodModal');
+        const modalContainer = modal.querySelector('.modal-container');
+
         const categories = ['All', ...new Set(foodData.map(item => item.category))];
         
-        const darkModeToggle = document.getElementById('dark-mode-toggle');
-
-        // Dark Mode Toggle
-        darkModeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark');
-            const isDarkMode = document.body.classList.contains('dark');
-            localStorage.setItem('darkMode', isDarkMode);
-            updateDarkModeIcon(isDarkMode);
-        });
-
-        function updateDarkModeIcon(isDarkMode) {
-            if (isDarkMode) {
-                darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-            } else {
-                darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-            }
-        }
-
-        function loadDarkModePreference() {
-            const isDarkMode = localStorage.getItem('darkMode') === 'true';
-            if (isDarkMode) {
-                document.body.classList.add('dark');
-            }
-            updateDarkModeIcon(isDarkMode);
-        }
-
-        loadDarkModePreference();
-        
-        // 카테고리 버튼 생성
         categories.forEach(cat => {
             const btn = document.createElement('button');
             btn.className = `px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition ${cat === 'All' ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`;
@@ -192,7 +148,6 @@
 
         renderFoods(foodData);
 
-        // 검색
         searchInput.addEventListener('input', (e) => {
             const keyword = e.target.value.toLowerCase();
             const filtered = foodData.filter(food => 
@@ -203,7 +158,6 @@
             renderFoods(filtered);
         });
 
-        // 필터
         function filterByCategory(category, clickedBtn) {
             Array.from(categoryContainer.children).forEach(b => {
                 b.className = 'px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition bg-gray-200 text-gray-500 hover:bg-gray-300';
@@ -213,47 +167,95 @@
             else renderFoods(foodData.filter(food => food.category === category));
         }
 
-        // 렌더링
         function renderFoods(data) {
             foodList.innerHTML = '';
-            if (data.length === 0) {
-                noResult.classList.remove('hidden');
-                return;
-            } else {
-                noResult.classList.add('hidden');
-            }
+            noResult.classList.toggle('hidden', data.length > 0);
+            
             data.forEach(food => {
-                const card = `
-                    <article class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition duration-300">
-                        <div class="relative h-56">
-                            <img src="${food.image}" alt="${food.name}" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                            <div class="absolute bottom-4 left-4 text-white">
-                                <h2 class="text-2xl font-bold">${food.name}</h2>
-                                <p class="text-sm opacity-90">${food.koreanName} • ${food.category}</p>
-                            </div>
-                        </div>
-                        <div class="p-5">
-                            <p class="text-gray-600 mb-4 text-sm leading-relaxed">${food.desc}</p>
-                            <div class="grid grid-cols-1 gap-3">
-                                <div class="bg-red-50 p-3 rounded-xl border border-red-100 flex gap-3 items-start">
-                                    <div class="bg-red-100 text-red-600 p-1.5 rounded-full shrink-0 mt-0.5"><i class="fas fa-times text-xs"></i></div>
-                                    <div><span class="block text-xs font-bold text-red-500 uppercase tracking-wide">Don't</span><p class="text-sm text-gray-700 font-medium">${food.dont}</p></div>
-                                </div>
-                                <div class="bg-green-50 p-3 rounded-xl border border-green-100 flex gap-3 items-start">
-                                    <div class="bg-green-100 text-green-600 p-1.5 rounded-full shrink-0 mt-0.5"><i class="fas fa-check text-xs"></i></div>
-                                    <div><span class="block text-xs font-bold text-green-600 uppercase tracking-wide">Do This</span><p class="text-sm text-gray-700 font-medium">${food.do}</p></div>
-                                </div>
-                            </div>
-                            <div class="mt-4 pt-4 border-t border-gray-100 flex items-center gap-2 text-yellow-600 text-sm">
-                                <i class="fas fa-lightbulb"></i><span class="font-bold text-xs bg-yellow-100 px-2 py-0.5 rounded">TIP</span><span class="text-gray-500 text-xs">${food.tip}</span>
-                            </div>
-                        </div>
-                    </article>
+                const card = document.createElement('article');
+                card.className = 'bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-lg transition duration-300';
+                card.innerHTML = `
+                    <div class="relative h-40">
+                        <img src="${food.image}" alt="${food.name}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                    </div>
+                    <div class="p-3">
+                        <h2 class="font-bold text-gray-800">${food.name}</h2>
+                        <p class="text-xs text-gray-500">${food.koreanName}</p>
+                    </div>
                 `;
-                foodList.innerHTML += card;
+                card.addEventListener('click', () => openModal(food));
+                foodList.appendChild(card);
             });
         }
+
+        function openModal(food) {
+            modalContainer.innerHTML = `
+                <div class="relative">
+                    <img src="${food.image}" class="w-full h-60 object-cover rounded-2xl mb-4">
+                    <div class="absolute top-4 right-4 bg-black/50 text-white text-xs px-2 py-1 rounded-full">${food.category}</div>
+                    <button id="closeModal" class="absolute top-4 left-4 bg-black/50 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-500 transition">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <h2 class="text-3xl font-extrabold mb-1">${food.name} <span class="font-normal text-xl text-gray-500">${food.koreanName}</span></h2>
+                <p class="text-gray-600 mb-6">${food.desc}</p>
+                
+                <div class="space-y-4">
+                    <div class="bg-red-50 p-4 rounded-xl">
+                        <h3 class="font-bold text-red-600 mb-2"><i class="fas fa-times-circle mr-2"></i>DON'T</h3>
+                        <p class="text-gray-700 font-medium">${food.dont}</p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-xl">
+                        <h3 class="font-bold text-green-600 mb-2"><i class="fas fa-check-circle mr-2"></i>DO</h3>
+                        <p class="text-gray-700 font-medium">${food.do}</p>
+                    </div>
+                    <div class="bg-yellow-50 p-4 rounded-xl">
+                        <h3 class="font-bold text-yellow-600 mb-2"><i class="fas fa-lightbulb mr-2"></i>TIP</h3>
+                        <p class="text-gray-700 font-medium">${food.tip}</p>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modalContainer.classList.remove('scale-95');
+
+            modal.querySelector('#closeModal').addEventListener('click', closeModal);
+        }
+
+        function closeModal() {
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modalContainer.classList.add('scale-95');
+        }
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Dark Mode
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        const isDarkMode = () => localStorage.getItem('darkMode') === 'true';
+
+        const setDarkMode = (isDark) => {
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                document.documentElement.classList.remove('dark');
+                darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        }
+        
+        darkModeToggle.addEventListener('click', () => {
+            const newIsDark = !isDarkMode();
+            localStorage.setItem('darkMode', newIsDark);
+            setDarkMode(newIsDark);
+        });
+
+        // Load theme on init
+        setDarkMode(isDarkMode());
     </script>
 </body>
 </html>

@@ -10,40 +10,13 @@
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Poppins:wght@400;600;800&display=swap');
         body { font-family: 'Poppins', 'Noto Sans KR', sans-serif; }
         .prose h2 { margin-top: 2em; }
-        
-        :root {
-            --bg-color: #f3f4f6;
-            --text-color: #1f2937;
-            --card-bg: #ffffff;
-            --nav-bg: #ffffff;
-        }
-
-        body.dark {
-            --bg-color: #1f2937;
-            --text-color: #f3f4f6;
-            --card-bg: #374151;
-            --nav-bg: #374151;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-        }
-
-        nav, .bg-white {
-            background-color: var(--nav-bg);
-        }
-        
-        .prose {
-            color: var(--text-color);
-        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800 min-h-screen">
 
-    <nav class="sticky top-0 z-50 bg-white shadow-md pb-4 pt-4 px-4 rounded-b-3xl">
+    <nav class="sticky top-0 z-40 bg-white shadow-md pb-4 pt-4 px-4 rounded-b-3xl">
         <div class="max-w-2xl mx-auto">
-            <div class="flex justify-between items-center mb-4">
+            <div class="flex justify-between items-center">
                 <a href="index.html" class="flex items-center gap-2">
                     <span class="text-3xl">🇰🇷</span>
                     <div>
@@ -51,12 +24,7 @@
                         <p class="text-xs text-gray-500 font-medium">Eat like a Local</p>
                     </div>
                 </a>
-                <div class="flex items-center gap-4">
-                    <button id="dark-mode-toggle" class="text-gray-500 hover:text-red-500">
-                        <i class="fas fa-moon"></i>
-                    </button>
-                    <a href="index.html" class="text-gray-500 hover:text-red-500 font-bold">Home</a>
-                </div>
+                <a href="index.html" class="text-gray-500 hover:text-red-500 font-bold">Home</a>
             </div>
         </div>
     </nav>
@@ -92,35 +60,6 @@
     <footer class="text-center py-6 text-gray-400 text-xs">
         <p>© 2026 How to K-Food. Save your stomach.</p>
     </footer>
-    
-    <script>
-        const darkModeToggle = document.getElementById('dark-mode-toggle');
 
-        // Dark Mode Toggle
-        darkModeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark');
-            const isDarkMode = document.body.classList.contains('dark');
-            localStorage.setItem('darkMode', isDarkMode);
-            updateDarkModeIcon(isDarkMode);
-        });
-
-        function updateDarkModeIcon(isDarkMode) {
-            if (isDarkMode) {
-                darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-            } else {
-                darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-            }
-        }
-
-        function loadDarkModePreference() {
-            const isDarkMode = localStorage.getItem('darkMode') === 'true';
-            if (isDarkMode) {
-                document.body.classList.add('dark');
-            }
-            updateDarkModeIcon(isDarkMode);
-        }
-
-        loadDarkModePreference();
-    </script>
 </body>
 </html>
