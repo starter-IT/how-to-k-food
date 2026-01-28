@@ -1,6 +1,46 @@
+:root {
+    --bg-color: #f9fafb;
+    --text-color: #1f2937;
+    --card-bg: #ffffff;
+    --nav-bg: #ffffff;
+    --header-bg: #fee2e2;
+    --footer-bg: #1f2937;
+    --footer-text: #ffffff;
+}
+
+body.dark {
+    --bg-color: #1f2937;
+    --text-color: #f9fafb;
+    --card-bg: #374151;
+    --nav-bg: #374151;
+    --header-bg: #4b5563;
+    --footer-bg: #111827;
+    --footer-text: #f9fafb;
+}
+
 body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+nav {
+    background-color: var(--nav-bg);
+}
+
+header {
+    background-color: var(--header-bg);
+}
+
+#food-info, .prose {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+footer {
+    background-color: var(--footer-bg);
+    color: var(--footer-text);
 }
 
 .perspective {
