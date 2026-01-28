@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://<your-github-username>.github.io/how-to-k-food/sitemap.xml
