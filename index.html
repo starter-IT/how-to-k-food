@@ -12,8 +12,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #FDFBF7;
+            background-color: #FDFBF7; /* Very light ivory */
             font-family: 'Poppins', 'Pretendard', sans-serif;
+            color: #333;
         }
         .modal {
             transition: opacity 0.25s ease;
@@ -21,29 +22,53 @@
         .modal-content {
             transition: transform 0.25s ease;
         }
+        .food-card {
+            background-color: #F3F4F6; /* Very light grey for cards */
+        }
+        /* Custom scrollbar for category container */
+        #categoryContainer::-webkit-scrollbar {
+            display: none;
+        }
+        #categoryContainer {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        .text-red-korean {
+            color: #EF4444; /* Tailwind red-500 equivalent */
+        }
     </style>
 </head>
 <body class="min-h-screen">
 
     <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-lg shadow-sm p-4">
         <div class="max-w-3xl mx-auto">
+            <div class="flex items-center justify-between mb-4">
+                <h1 class="text-2xl font-extrabold text-red-500">K-Food Rescue Guide</h1>
+                <span class="text-sm text-gray-500">Eat like a Local!</span>
+            </div>
             <div class="relative">
                 <input type="text" id="searchInput" placeholder="Search food (e.g. Bibimbap...)"
                        class="w-full bg-gray-100 text-gray-800 rounded-full pl-12 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 font-semibold shadow-inner">
                 <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400"></i>
             </div>
-            <div id="categoryContainer" class="flex gap-2 mt-3 overflow-x-auto" style="scrollbar-width: none; -ms-overflow-style: none; &::-webkit-scrollbar { display: none; }">
+            <div id="categoryContainer" class="flex gap-2 mt-3 overflow-x-auto">
                 <!-- Category buttons will be injected here -->
             </div>
         </div>
     </header>
 
-    <main class="max-w-3xl mx-auto p-4">
+    <main class="max-w-3xl mx-auto p-4 py-8">
         <div id="foodList" class="grid grid-cols-2 md:grid-cols-3 gap-4">
             <!-- Food cards will be injected here -->
         </div>
+        <div id="noResult" class="hidden text-center py-10 text-gray-500">
+            <p class="text-4xl mb-3">🤔</p>
+            <p class="text-lg font-bold">No results found.</p>
+            <p class="text-sm">Try a different search term or category.</p>
+        </div>
     </main>
 
+    <!-- Modal -->
     <div id="foodModal" class="fixed inset-0 z-50 p-4 flex items-center justify-center bg-black/60 opacity-0 pointer-events-none modal">
         <div id="modalContent" class="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto modal-content transform scale-95">
             <!-- Modal content will be injected here -->
@@ -56,6 +81,7 @@
             const foodList = document.getElementById('foodList');
             const searchInput = document.getElementById('searchInput');
             const categoryContainer = document.getElementById('categoryContainer');
+            const noResult = document.getElementById('noResult');
             const modal = document.getElementById('foodModal');
             const modalContent = document.getElementById('modalContent');
 
@@ -64,10 +90,10 @@
             // Render category buttons
             allCategories.forEach(categoryName => {
                 const food = foodData.find(f => f.category.name === categoryName);
-                const icon = food ? food.category.icon : '🍴';
+                const emoji = food ? food.category.icon : '🍽️'; // Use category icon directly
                 const button = document.createElement('button');
                 button.className = `category-btn whitespace-nowrap px-4 py-1.5 text-sm font-bold rounded-full transition-colors duration-300 ${categoryName === 'All' ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-600'}`;
-                button.textContent = `${icon} ${categoryName}`;
+                button.innerHTML = `${emoji} ${categoryName}`; // Use innerHTML for emoji
                 button.dataset.category = categoryName;
                 categoryContainer.appendChild(button);
             });
@@ -75,13 +101,20 @@
             const renderFoods = (filterFn = () => true) => {
                 foodList.innerHTML = '';
                 const filteredFoods = foodData.filter(filterFn);
+                
+                if (filteredFoods.length === 0) {
+                    noResult.classList.remove('hidden');
+                } else {
+                    noResult.classList.add('hidden');
+                }
+
                 filteredFoods.forEach(food => {
                     const card = document.createElement('div');
-                    card.className = 'relative rounded-2xl overflow-hidden shadow-sm cursor-pointer aspect-square group';
+                    card.className = 'food-card relative rounded-2xl overflow-hidden shadow-sm cursor-pointer aspect-square flex flex-col justify-center items-center p-4 text-center hover:shadow-lg transition-all duration-200';
                     card.innerHTML = `
-                        <img src="${food.image}" alt="${food.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                        <h3 class="absolute bottom-3 left-4 text-white font-bold text-lg">${food.name}</h3>
+                        <span class="text-4xl mb-2">${food.emoji}</span>
+                        <h3 class="text-gray-800 font-bold text-lg leading-tight">${food.name}</h3>
+                        <p class="text-red-korean font-semibold text-base">${food.koreanName}</p>
                     `;
                     card.addEventListener('click', () => openModal(food));
                     foodList.appendChild(card);
@@ -89,51 +122,64 @@
             };
 
             const openModal = (food) => {
+                const googleSearchUrl = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(food.name)}`;
+                const youtubeSearchUrl = `https://www.youtube.com/results?search_query=how+to+eat+${encodeURIComponent(food.name)}`;
+
                 modalContent.innerHTML = `
-                    <div class="relative">
-                        <img src="${food.image}" alt="${food.name}" class="w-full h-56 object-cover rounded-t-2xl">
-                        <button id="closeModalBtn" class="absolute top-3 right-3 bg-black/40 text-white w-8 h-8 rounded-full hover:bg-red-500 transition-colors">&times;</button>
-                    </div>
                     <div class="p-6">
-                        <div class="flex items-baseline gap-2">
-                            <h2 class="text-3xl font-extrabold">${food.name}</h2>
-                            <p class="text-gray-500 font-semibold">${food.koreanName}</p>
+                        <button id="closeModalBtn" class="absolute top-4 right-4 bg-gray-200 text-gray-600 w-8 h-8 rounded-full hover:bg-gray-300 flex items-center justify-center transition-colors">&times;</button>
+                        <div class="text-center mb-6">
+                            <span class="text-5xl block mb-2">${food.emoji}</span>
+                            <h2 class="text-4xl font-extrabold text-gray-900">${food.name}</h2>
+                            <p class="text-red-korean text-2xl font-bold">${food.koreanName}</p>
                         </div>
-                        <p class="text-gray-600 mt-2">${food.howToEat}</p>
                         
-                        <div class="mt-6 space-y-3">
+                        <div class="space-y-4">
+                            <div>
+                                <h3 class="font-bold text-lg mb-2">How to Enjoy:</h3>
+                                <p class="text-gray-700 leading-relaxed">${food.howToEat}</p>
+                            </div>
+
                             <div class="bg-green-50 text-green-800 p-4 rounded-xl border-l-4 border-green-400">
-                                <h3 class="font-bold text-sm flex items-center gap-2"><i class="fas fa-check-circle"></i> DO THIS</h3>
+                                <h3 class="font-bold text-base flex items-center gap-2"><i class="fas fa-check-circle"></i> DO THIS</h3>
                                 <p class="mt-1 text-sm font-medium">${food.do}</p>
                             </div>
                             <div class="bg-red-50 text-red-800 p-4 rounded-xl border-l-4 border-red-400">
-                                <h3 class="font-bold text-sm flex items-center gap-2"><i class="fas fa-times-circle"></i> NEVER DO THIS</h3>
+                                <h3 class="font-bold text-base flex items-center gap-2"><i class="fas fa-times-circle"></i> NEVER DO THIS</h3>
                                 <p class="mt-1 text-sm font-medium">${food.dont}</p>
                             </div>
                             <div class="bg-yellow-50 text-yellow-800 p-4 rounded-xl border-l-4 border-yellow-400">
-                                <h3 class="font-bold text-sm flex items-center gap-2"><i class="fas fa-lightbulb"></i> PRO TIP</h3>
+                                <h3 class="font-bold text-base flex items-center gap-2"><i class="fas fa-lightbulb"></i> PRO TIP</h3>
                                 <p class="mt-1 text-sm font-medium">${food.proTip}</p>
                             </div>
                         </div>
-                        <div class="mt-6">
-                            <a href="${food.videoUrl}" target="_blank" class="w-full bg-red-600 text-white py-3 rounded-xl flex items-center justify-center gap-2 font-bold text-lg hover:bg-red-700 transition-colors">
-                                📺 Watch Video Guide
+
+                        <div class="mt-8 space-y-3">
+                            <a href="${googleSearchUrl}" target="_blank" class="w-full bg-blue-500 text-white py-3 rounded-xl flex items-center justify-center gap-2 font-bold text-lg hover:bg-blue-600 transition-colors">
+                                <i class="fas fa-search"></i> 🔍 See Photos on Google
+                            </a>
+                            <a href="${youtubeSearchUrl}" target="_blank" class="w-full bg-red-600 text-white py-3 rounded-xl flex items-center justify-center gap-2 font-bold text-lg hover:bg-red-700 transition-colors">
+                                <i class="fab fa-youtube"></i> ▶️ Watch Videos on YouTube
                             </a>
                         </div>
                     </div>
                 `;
                 modal.classList.remove('opacity-0', 'pointer-events-none');
                 modalContent.classList.remove('scale-95');
+                modalContent.classList.add('scale-100'); // Ensure it scales up
                 document.getElementById('closeModalBtn').addEventListener('click', closeModal);
             };
 
             const closeModal = () => {
                 modal.classList.add('opacity-0', 'pointer-events-none');
+                modalContent.classList.remove('scale-100'); // Scale back down
                 modalContent.classList.add('scale-95');
             };
 
             modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeModal();
+                if (e.target === modal) {
+                    closeModal();
+                }
             });
 
             searchInput.addEventListener('input', (e) => {
@@ -141,7 +187,9 @@
                 renderFoods(food =>
                     food.name.toLowerCase().includes(keyword) ||
                     food.koreanName.toLowerCase().includes(keyword) ||
-                    food.category.name.toLowerCase().includes(keyword)
+                    food.howToEat.toLowerCase().includes(keyword) ||
+                    food.dont.toLowerCase().includes(keyword) ||
+                    food.proTip.toLowerCase().includes(keyword)
                 );
             });
 
