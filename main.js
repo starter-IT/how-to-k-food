@@ -15,9 +15,18 @@ const modalTip = document.getElementById('modal-tip');
 const googlePhotosButton = document.getElementById('google-photos-button');
 const youtubeVideosButton = document.getElementById('youtube-videos-button');
 
+// Added for About Modal
+const aboutUsButton = document.getElementById('about-us-button');
+const aboutModal = document.getElementById('about-modal');
+const aboutCloseButton = aboutModal ? aboutModal.querySelector('.about-close-button') : null;
+
 // Ensure modal is hidden immediately when script starts, overriding any potential initial display issues.
 if (foodModal) {
     foodModal.style.display = 'none';
+}
+// Added for aboutModal
+if (aboutModal) {
+    aboutModal.style.display = 'none';
 }
 
 let currentFoods = [...foods]; // To hold the currently filtered/searched foods
@@ -138,6 +147,28 @@ function closeFoodModal() {
     document.body.style.overflow = ''; // Restore scrolling on body
 }
 
+// --- About Modal Functions ---
+
+function openAboutModal() {
+    // If food modal is open, close it first to ensure only one modal is active
+    if (foodModal && foodModal.classList.contains('active')) {
+        closeFoodModal();
+    }
+    if (aboutModal) {
+        aboutModal.style.display = 'flex';
+        aboutModal.classList.add('active');
+    }
+    document.body.style.overflow = 'hidden';
+}
+
+function closeAboutModal() {
+    if (aboutModal) {
+        aboutModal.classList.remove('active');
+        aboutModal.style.display = 'none';
+    }
+    document.body.style.overflow = '';
+}
+
 // --- Event Listeners ---
 if (searchBar) searchBar.addEventListener('input', filterAndSearchFoods);
 if (closeButton) closeButton.addEventListener('click', closeFoodModal);
@@ -154,12 +185,33 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
+// --- Event Listeners for About Modal ---
+if (aboutUsButton) aboutUsButton.addEventListener('click', openAboutModal);
+if (aboutCloseButton) aboutCloseButton.addEventListener('click', closeAboutModal);
+if (aboutModal) {
+    aboutModal.addEventListener('click', (event) => {
+        if (event.target === aboutModal) {
+            closeAboutModal();
+        }
+    });
+}
+document.addEventListener('keydown', (event) => {
+    // Check if aboutModal is active, and foodModal is NOT active, to avoid conflict
+    if (event.key === 'Escape' && aboutModal && aboutModal.classList.contains('active') && !(foodModal && foodModal.classList.contains('active'))) {
+        closeAboutModal();
+    }
+});
+
 
 // --- Initial Load ---
 document.addEventListener('DOMContentLoaded', () => {
     // As a double check, ensure modal is hidden on DOMContentLoaded too
     if (foodModal) {
         foodModal.style.display = 'none';
+    }
+    // Added for aboutModal
+    if (aboutModal) {
+        aboutModal.style.display = 'none';
     }
 
     // Only render if elements exist
