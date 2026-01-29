@@ -1,150 +1,146 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const cube = document.getElementById('cube');
-    const foodInfo = document.getElementById('food-info');
-    const foodName = document.getElementById('food-name');
-    const foodDesc = document.getElementById('food-desc');
-    const howToEat = document.getElementById('how-to-eat');
-    const foodGrid = document.getElementById('food-grid');
-    const searchInput = document.getElementById('searchInput');
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const darkModeToggle = document.getElementById('dark-mode-toggle');
+import foods from './foods.js';
 
-    let currentRotation = { x: 0, y: 0 };
-    let isDragging = false;
-    let previousMousePosition = { x: 0, y: 0 };
+// Get DOM elements
+const foodListElement = document.getElementById('food-list');
+const searchBar = document.getElementById('search-bar');
+const categoryFiltersElement = document.getElementById('category-filters');
+const foodModal = document.getElementById('food-modal');
+const closeButton = foodModal.querySelector('.close-button');
+const modalEmoji = document.getElementById('modal-emoji');
+const modalNameEn = document.getElementById('modal-name-en');
+const modalNameKo = document.getElementById('modal-name-ko');
+const modalHowToEat = document.getElementById('modal-how-to-eat');
+const modalDont = document.getElementById('modal-dont');
+const modalTip = document.getElementById('modal-tip');
+const googlePhotosButton = document.getElementById('google-photos-button');
+const youtubeVideosButton = document.getElementById('youtube-videos-button');
 
-    function initCube() {
-        if (!cube) return;
-        const faces = ['front', 'back', 'right', 'left', 'top', 'bottom'];
-        const cubeFoods = foodData.slice(0, 6);
+let currentFoods = [...foods]; // To hold the currently filtered/searched foods
 
-        faces.forEach((face, index) => {
-            const food = cubeFoods[index];
-            if (!food) return;
-            const faceDiv = document.createElement('div');
-            faceDiv.classList.add('cube-face', face);
-            faceDiv.style.backgroundImage = `url(${food.image})`;
-            faceDiv.innerHTML = `<div class="overlay">${food.name}</div>`;
-            faceDiv.addEventListener('click', () => showFoodInfo(food));
-            cube.appendChild(faceDiv);
-        });
+// --- Rendering Functions ---
+
+// Renders all food cards
+function renderFoodCards(foodArray) {
+    foodListElement.innerHTML = ''; // Clear existing cards
+    if (foodArray.length === 0) {
+        foodListElement.innerHTML = '<p class="no-results">No K-Food found matching your criteria.</p>';
+        return;
     }
+    foodArray.forEach(food => {
+        const foodCard = document.createElement('div');
+        foodCard.classList.add('food-card');
+        foodCard.dataset.id = food.id; // Store food ID for modal lookup
 
-    function initGrid() {
-        if (!foodGrid) return;
-        foodData.forEach(food => {
-            const img = document.createElement('img');
-            img.src = food.image;
-            img.alt = food.name;
-            img.classList.add('w-full', 'h-24', 'object-cover', 'rounded-lg', 'cursor-pointer', 'shadow-md');
-            img.addEventListener('click', () => showFoodInfo(food));
-            foodGrid.appendChild(img);
-        });
-    }
-
-    function showFoodInfo(food) {
-        if (!foodInfo) return;
-        foodName.textContent = food.name;
-        foodDesc.textContent = food.desc;
-
-        howToEat.innerHTML = `
-            <div class="bg-red-50 p-4 rounded-lg border-l-4 border-red-500 mt-4">
-                <h3 class="font-bold text-red-700"><i class="fas fa-times-circle"></i> Don't</h3>
-                <p class="text-sm text-gray-700">${food.dont}</p>
-            </div>
-            <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-500 mt-2">
-                <h3 class="font-bold text-green-700"><i class="fas fa-check-circle"></i> Do</h3>
-                <p class="text-sm text-gray-700">${food.do}</p>
-            </div>
+        foodCard.innerHTML = `
+            <div class="food-card-emoji">${food.emoji}</div>
+            <div class="food-card-name-en">${food.name}</div>
+            <div class="food-card-name-ko">${food.koreanName}</div>
         `;
-        
-        window.scrollTo({ top: foodInfo.offsetTop - 100, behavior: 'smooth' });
-    }
+        foodCard.addEventListener('click', () => openFoodModal(food.id));
+        foodListElement.appendChild(foodCard);
+    });
+}
 
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const filteredFoods = foodData.filter(food =>
-                food.name.toLowerCase().includes(searchTerm) ||
-                food.koreanName.toLowerCase().includes(searchTerm)
-            );
-            
-            if (filteredFoods.length > 0) {
-                showFoodInfo(filteredFoods[0]);
-            }
-            
-            foodGrid.innerHTML = '';
-            filteredFoods.forEach(food => {
-                const img = document.createElement('img');
-                img.src = food.image;
-                img.alt = food.name;
-                img.classList.add('w-full', 'h-24', 'object-cover', 'rounded-lg', 'cursor-pointer', 'shadow-md');
-                img.addEventListener('click', () => showFoodInfo(food));
-                foodGrid.appendChild(img);
-            });
-        });
-    }
+// Generates and renders category filter buttons
+function renderCategoryFilters() {
+    const categories = ['All', ...new Set(foods.map(food => food.category))]; // Get unique categories
+    categoryFiltersElement.innerHTML = '';
 
-    // Mobile menu toggle
-    if (mobileMenuButton) {
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
-    }
-
-    // Dark Mode Toggle
-    if (darkModeToggle) {
-        darkModeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark');
-            const isDarkMode = document.body.classList.contains('dark');
-            localStorage.setItem('darkMode', isDarkMode);
-            updateDarkModeIcon(isDarkMode);
-        });
-    }
-
-    function updateDarkModeIcon(isDarkMode) {
-        if (!darkModeToggle) return;
-        if (isDarkMode) {
-            darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-        } else {
-            darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+    categories.forEach(category => {
+        const button = document.createElement('button');
+        button.classList.add('category-filter-btn');
+        button.textContent = category;
+        button.dataset.category = category;
+        if (category === 'All') {
+            button.classList.add('active'); // 'All' is active by default
         }
+        button.addEventListener('click', () => filterByCategory(category));
+        categoryFiltersElement.appendChild(button);
+    });
+}
+
+// --- Filtering and Searching Logic ---
+
+let activeCategory = 'All'; // Track active category
+
+function filterAndSearchFoods() {
+    let filtered = [...foods];
+
+    // Apply category filter
+    if (activeCategory !== 'All') {
+        filtered = filtered.filter(food => food.category === activeCategory);
     }
 
-    function loadDarkModePreference() {
-        const isDarkMode = localStorage.getItem('darkMode') === 'true';
-        if (isDarkMode) {
-            document.body.classList.add('dark');
-        }
-        updateDarkModeIcon(isDarkMode);
+    // Apply search filter
+    const searchTerm = searchBar.value.toLowerCase().trim();
+    if (searchTerm) {
+        filtered = filtered.filter(food =>
+            food.name.toLowerCase().includes(searchTerm) ||
+            food.koreanName.toLowerCase().includes(searchTerm) ||
+            food.category.toLowerCase().includes(searchTerm) ||
+            food.howToEat.toLowerCase().includes(searchTerm) ||
+            food.dont.toLowerCase().includes(searchTerm) ||
+            food.tip.toLowerCase().includes(searchTerm)
+        );
     }
-    
-    // Cube rotation logic
-    if (cube) {
-        cube.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            previousMousePosition = { x: e.clientX, y: e.clientY };
-        });
+    currentFoods = filtered;
+    renderFoodCards(currentFoods);
+}
 
-        document.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            const deltaX = e.clientX - previousMousePosition.x;
-            const deltaY = e.clientY - previousMousePosition.y;
+function filterByCategory(category) {
+    // Update active category button styling
+    document.querySelectorAll('.category-filter-btn').forEach(button => {
+        button.classList.remove('active');
+    });
+    document.querySelector(`.category-filter-btn[data-category="${category}"]`).classList.add('active');
 
-            currentRotation.y += deltaX * 0.5;
-            currentRotation.x -= deltaY * 0.5;
+    activeCategory = category;
+    filterAndSearchFoods();
+}
 
-            cube.style.transform = `translateZ(-125px) rotateX(${currentRotation.x}deg) rotateY(${currentRotation.y}deg)`;
-            previousMousePosition = { x: e.clientX, y: e.clientY };
-        });
+// --- Modal Functions ---
 
-        document.addEventListener('mouseup', () => {
-            isDragging = false;
-        });
+function openFoodModal(foodId) {
+    const food = foods.find(f => f.id === foodId);
+    if (!food) return;
+
+    modalEmoji.textContent = food.emoji;
+    modalNameEn.textContent = food.name;
+    modalNameKo.textContent = food.koreanName;
+    modalHowToEat.textContent = food.howToEat;
+    modalDont.textContent = food.dont;
+    modalTip.textContent = food.tip;
+
+    // Set up external links
+    googlePhotosButton.onclick = () => window.open(`https://www.google.com/search?tbm=isch&q=${encodeURIComponent('Korean food ' + food.name)}`, '_blank');
+    youtubeVideosButton.onclick = () => window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent('Korean food ' + food.name)}`, '_blank');
+
+    foodModal.classList.add('active');
+    document.body.style.overflow = 'hidden'; // Prevent scrolling on body when modal is open
+}
+
+function closeFoodModal() {
+    foodModal.classList.remove('active');
+    document.body.style.overflow = ''; // Restore scrolling on body
+}
+
+// --- Event Listeners ---
+searchBar.addEventListener('input', filterAndSearchFoods);
+closeButton.addEventListener('click', closeFoodModal);
+foodModal.addEventListener('click', (event) => {
+    if (event.target === foodModal) { // Close when clicking outside the modal content
+        closeFoodModal();
     }
+});
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && foodModal.classList.contains('active')) {
+        closeFoodModal();
+    }
+});
 
-    initCube();
-    initGrid();
-    loadDarkModePreference();
+
+// --- Initial Load ---
+document.addEventListener('DOMContentLoaded', () => {
+    renderCategoryFilters();
+    renderFoodCards(foods); // Render all foods initially
 });
