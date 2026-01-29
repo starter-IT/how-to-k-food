@@ -41,7 +41,7 @@ function renderFoodCards(foodArray) {
         return;
     }
     foodArray.forEach(food => {
-        const foodCard = document.createElement('div');
+        const foodCard = document.createElement('article');
         foodCard.classList.add('food-card');
         foodCard.dataset.id = food.id; // Store food ID for modal lookup
 
