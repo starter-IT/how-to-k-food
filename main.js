@@ -20,6 +20,11 @@ const aboutUsButton = document.getElementById('about-us-button');
 const aboutModal = document.getElementById('about-modal');
 const aboutCloseButton = aboutModal ? aboutModal.querySelector('.about-close-button') : null;
 
+// Added for Privacy Modal
+const privacyPolicyButton = document.getElementById('privacy-policy-button');
+const privacyModal = document.getElementById('privacy-modal');
+const privacyCloseButton = privacyModal ? privacyModal.querySelector('.privacy-close-button') : null;
+
 // Ensure modal is hidden immediately when script starts, overriding any potential initial display issues.
 if (foodModal) {
     foodModal.style.display = 'none';
@@ -27,6 +32,10 @@ if (foodModal) {
 // Added for aboutModal
 if (aboutModal) {
     aboutModal.style.display = 'none';
+}
+// Added for privacyModal
+if (privacyModal) {
+    privacyModal.style.display = 'none';
 }
 
 let currentFoods = [...foods]; // To hold the currently filtered/searched foods
@@ -169,6 +178,32 @@ function closeAboutModal() {
     document.body.style.overflow = '';
 }
 
+// --- Privacy Modal Functions ---
+
+function openPrivacyModal() {
+    // If food modal is open, close it first
+    if (foodModal && foodModal.classList.contains('active')) {
+        closeFoodModal();
+    }
+    // If about modal is open, close it first
+    if (aboutModal && aboutModal.classList.contains('active')) {
+        closeAboutModal();
+    }
+    if (privacyModal) {
+        privacyModal.style.display = 'flex';
+        privacyModal.classList.add('active');
+    }
+    document.body.style.overflow = 'hidden';
+}
+
+function closePrivacyModal() {
+    if (privacyModal) {
+        privacyModal.classList.remove('active');
+        privacyModal.style.display = 'none';
+    }
+    document.body.style.overflow = '';
+}
+
 // --- Event Listeners ---
 if (searchBar) searchBar.addEventListener('input', filterAndSearchFoods);
 if (closeButton) closeButton.addEventListener('click', closeFoodModal);
@@ -202,6 +237,23 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
+// --- Event Listeners for Privacy Modal ---
+if (privacyPolicyButton) privacyPolicyButton.addEventListener('click', openPrivacyModal);
+if (privacyCloseButton) privacyCloseButton.addEventListener('click', closePrivacyModal);
+if (privacyModal) {
+    privacyModal.addEventListener('click', (event) => {
+        if (event.target === privacyModal) {
+            closePrivacyModal();
+        }
+    });
+}
+document.addEventListener('keydown', (event) => {
+    // Check if privacyModal is active, and other modals are NOT, to avoid conflict
+    if (event.key === 'Escape' && privacyModal && privacyModal.classList.contains('active') && !(foodModal && foodModal.classList.contains('active')) && !(aboutModal && aboutModal.classList.contains('active'))) {
+        closePrivacyModal();
+    }
+});
+
 
 // --- Initial Load ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -212,6 +264,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Added for aboutModal
     if (aboutModal) {
         aboutModal.style.display = 'none';
+    }
+    // Added for privacyModal
+    if (privacyModal) {
+        privacyModal.style.display = 'none';
     }
 
     // Only render if elements exist

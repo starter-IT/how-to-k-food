@@ -429,3 +429,44 @@ footer p {
     justify-content: center;
     max-width: 700px; /* Constrain width for better ad display */
 }
+
+/* Privacy Policy Modal Specifics */
+/* Reuse .modal and .modal-content general styles */
+
+.privacy-modal-body {
+    text-align: left; /* Align text left for readability */
+    font-size: 1.05em;
+    line-height: 1.8; /* Increased line-height for readability */
+    color: #1F2937; /* Consistent dark gray */
+}
+
+.privacy-modal-body p {
+    margin-bottom: 1em; /* Space between paragraphs */
+}
+
+.privacy-modal-body h3 {
+    color: #1d3557;
+    font-size: 1.1em;
+    margin-top: 1.5em; /* Space before new sections */
+    margin-bottom: 0.8em;
+}
+
+.privacy-modal-body strong {
+    color: #1d3557; /* Highlight important terms */
+}
+
+.privacy-close-button {
+    /* Specific styling if needed, otherwise inherits from .close-button */
+    color: #457b9d;
+}
+.privacy-close-button:hover,
+.privacy-close-button:focus {
+    color: #1d3557;
+}
+
+/* Responsive Adjustments for Privacy Modal */
+@media (max-width: 600px) {
+    .privacy-modal-body {
+        font-size: 0.95em;
+    }
+}
