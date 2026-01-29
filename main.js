@@ -5,7 +5,7 @@ const foodListElement = document.getElementById('food-list');
 const searchBar = document.getElementById('search-bar');
 const categoryFiltersElement = document.getElementById('category-filters');
 const foodModal = document.getElementById('food-modal');
-const closeButton = foodModal.querySelector('.close-button');
+const closeButton = foodModal ? foodModal.querySelector('.close-button') : null; // Added null check
 const modalEmoji = document.getElementById('modal-emoji');
 const modalNameEn = document.getElementById('modal-name-en');
 const modalNameKo = document.getElementById('modal-name-ko');
@@ -14,6 +14,11 @@ const modalDont = document.getElementById('modal-dont');
 const modalTip = document.getElementById('modal-tip');
 const googlePhotosButton = document.getElementById('google-photos-button');
 const youtubeVideosButton = document.getElementById('youtube-videos-button');
+
+// Ensure modal is hidden immediately when script starts, overriding any potential initial display issues.
+if (foodModal) {
+    foodModal.style.display = 'none';
+}
 
 let currentFoods = [...foods]; // To hold the currently filtered/searched foods
 
@@ -92,7 +97,10 @@ function filterByCategory(category) {
     document.querySelectorAll('.category-filter-btn').forEach(button => {
         button.classList.remove('active');
     });
-    document.querySelector(`.category-filter-btn[data-category="${category}"]`).classList.add('active');
+    const targetButton = document.querySelector(`.category-filter-btn[data-category="${category}"]`);
+    if (targetButton) { // Added null check
+        targetButton.classList.add('active');
+    }
 
     activeCategory = category;
     filterAndSearchFoods();
@@ -104,36 +112,44 @@ function openFoodModal(foodId) {
     const food = foods.find(f => f.id === foodId);
     if (!food) return;
 
-    modalEmoji.textContent = food.emoji;
-    modalNameEn.textContent = food.name;
-    modalNameKo.textContent = food.koreanName;
-    modalHowToEat.textContent = food.howToEat;
-    modalDont.textContent = food.dont;
-    modalTip.textContent = food.tip;
+    if (modalEmoji) modalEmoji.textContent = food.emoji;
+    if (modalNameEn) modalNameEn.textContent = food.name;
+    if (modalNameKo) modalNameKo.textContent = food.koreanName;
+    if (modalHowToEat) modalHowToEat.textContent = food.howToEat;
+    if (modalDont) modalDont.textContent = food.dont;
+    if (modalTip) modalTip.textContent = food.tip;
 
     // Set up external links
-    googlePhotosButton.onclick = () => window.open(`https://www.google.com/search?tbm=isch&q=${encodeURIComponent('Korean food ' + food.name)}`, '_blank');
-    youtubeVideosButton.onclick = () => window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent('Korean food ' + food.name)}`, '_blank');
+    if (googlePhotosButton) googlePhotosButton.onclick = () => window.open(`https://www.google.com/search?tbm=isch&q=${encodeURIComponent('Korean food ' + food.name)}`, '_blank');
+    if (youtubeVideosButton) youtubeVideosButton.onclick = () => window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent('Korean food ' + food.name)}`, '_blank');
 
-    foodModal.classList.add('active');
+    if (foodModal) {
+        foodModal.style.display = 'flex'; // Use flex to center, matches CSS active class
+        foodModal.classList.add('active');
+    }
     document.body.style.overflow = 'hidden'; // Prevent scrolling on body when modal is open
 }
 
 function closeFoodModal() {
-    foodModal.classList.remove('active');
+    if (foodModal) {
+        foodModal.classList.remove('active');
+        foodModal.style.display = 'none'; // Ensure it's hidden explicitly
+    }
     document.body.style.overflow = ''; // Restore scrolling on body
 }
 
 // --- Event Listeners ---
-searchBar.addEventListener('input', filterAndSearchFoods);
-closeButton.addEventListener('click', closeFoodModal);
-foodModal.addEventListener('click', (event) => {
-    if (event.target === foodModal) { // Close when clicking outside the modal content
-        closeFoodModal();
-    }
-});
+if (searchBar) searchBar.addEventListener('input', filterAndSearchFoods);
+if (closeButton) closeButton.addEventListener('click', closeFoodModal);
+if (foodModal) {
+    foodModal.addEventListener('click', (event) => {
+        if (event.target === foodModal) { // Close when clicking outside the modal content
+            closeFoodModal();
+        }
+    });
+}
 document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && foodModal.classList.contains('active')) {
+    if (event.key === 'Escape' && foodModal && foodModal.classList.contains('active')) {
         closeFoodModal();
     }
 });
@@ -141,6 +157,12 @@ document.addEventListener('keydown', (event) => {
 
 // --- Initial Load ---
 document.addEventListener('DOMContentLoaded', () => {
-    renderCategoryFilters();
-    renderFoodCards(foods); // Render all foods initially
+    // As a double check, ensure modal is hidden on DOMContentLoaded too
+    if (foodModal) {
+        foodModal.style.display = 'none';
+    }
+
+    // Only render if elements exist
+    if (categoryFiltersElement) renderCategoryFilters();
+    if (foodListElement) renderFoodCards(foods); // Render all foods initially
 });
