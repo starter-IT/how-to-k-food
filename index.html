@@ -19,13 +19,15 @@
             <input type="text" id="search-bar" placeholder="Search K-Food...">
             <div class="category-filters" id="category-filters"></div>
         </header>
-    <div id="ad-slot-top" class="ad-slot">Top Banner Ad</div>
-    <main id="food-list">
+        
+        <div id="ad-slot-top" class="ad-slot">Top Banner Ad</div>
+
         <div id="static-intro" style="padding: 20px; max-width: 800px; margin: 0 auto; color: #444; line-height: 1.8;">
             <div style="text-align: center; margin-bottom: 30px;">
                 <h2 style="font-size: 1.8rem; color: #d32f2f; margin-bottom: 10px;">Welcome to the Ultimate K-Food Guide</h2>
                 <p style="font-size: 1rem; color: #666;">Essential tips to eat like a local in Korea.</p>
             </div>
+
             <article style="background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: left;">
                 <h3 style="color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">Before You Eat: 5 Korean Dining Rules</h3>
                 
@@ -43,76 +45,85 @@
                 <br>
                 <p><strong>5. The "Call Button"</strong><br>
                 If you see a button on the table, don't be shy to press it. It calls the server ("Ding-Dong"). It is the most polite and efficient way to order in busy restaurants, rather than waving your hands.</p>
+
                 <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
                 <p style="text-align: center; font-weight: bold; color: #d32f2f;">
                     👇 Search or select a food below to start! 👇
                 </p>
             </article>
         </div>
-    </main>
-    <div id="ad-slot-bottom" class="ad-slot">Bottom Banner Ad</div>
-    
-    <footer>
-        <p>Copyright © 2026 How to K-Food. All rights reserved.</p>
-        <div class="footer-links" style="margin-top: 10px;">
-            <button id="about-us-button" class="footer-button">About Us</button>
-            <button id="privacy-policy-button" class="footer-button">Privacy Policy</button>
-            <button id="contact-us-button" class="footer-button">Contact Us</button>
+
+        <main id="food-list"></main>
+
+        <div id="ad-slot-bottom" class="ad-slot">Bottom Banner Ad</div>
+        
+        <footer>
+            <p>Copyright © 2026 How to K-Food. All rights reserved.</p>
+            <div class="footer-links" style="margin-top: 10px;">
+                <button id="about-us-button" class="footer-button">About Us</button>
+                <button id="privacy-policy-button" class="footer-button">Privacy Policy</button>
+                <button id="contact-us-button" class="footer-button">Contact Us</button>
+            </div>
+        </footer>
+
+        <div id="food-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <div class="modal-header">
+                    <div class="modal-emoji" id="modal-emoji"></div>
+                    <h2 class="modal-name" id="modal-name-en"></h2>
+                    <p class="modal-name-ko" id="modal-name-ko"></p>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-section"><h3>✅ How to Eat</h3><p id="modal-how-to-eat"></p></div>
+                    <div class="modal-section"><h3>❌ Don't</h3><p id="modal-dont"></p></div>
+                    <div class="modal-section"><h3>💡 Pro Tip</h3><p id="modal-tip"></p></div>
+                </div>
+                <div class="modal-footer">
+                    <button id="google-photos-button">🔍 Google Photos</button>
+                    <button id="youtube-videos-button">📺 YouTube Videos</button>
+                </div>
+            </div>
         </div>
-    </footer>
-    <div id="food-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <div class="modal-header">
-                <div class="modal-emoji" id="modal-emoji"></div>
-                <h2 class="modal-name" id="modal-name-en"></h2>
-                <p class="modal-name-ko" id="modal-name-ko"></p>
+
+        <div id="about-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close-button about-close-button">&times;</span>
+                <div class="modal-header"><h2 class="modal-name-en">About Us & Mission</h2></div>
+                <div class="modal-body about-modal-body">
+                    <p>Welcome to <strong>How to K-Food</strong>! Our mission is to provide authentic guides to Korean cuisine.</p>
+                    <p>We help you navigate Korean culinary etiquette and enjoy meals like a local.</p>
+                </div>
             </div>
-            <div class="modal-body">
-                <div class="modal-section"><h3>✅ How to Eat</h3><p id="modal-how-to-eat"></p></div>
-                <div class="modal-section"><h3>❌ Don't</h3><p id="modal-dont"></p></div>
-                <div class="modal-section"><h3>💡 Pro Tip</h3><p id="modal-tip"></p></div>
+        </div>
+
+        <div id="privacy-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close-button privacy-close-button">&times;</span>
+                <div class="modal-header"><h2 class="modal-name-en">Privacy Policy & Disclaimer</h2></div>
+                <div class="modal-body privacy-modal-body">
+                    <h3 style="color: #d32f2f;">Disclaimer</h3>
+                    <p>The content provided on this website is for informational and cultural purposes only. Please be aware of any food allergies you may have. We are not responsible for any adverse effects resulting from the consumption of foods listed here.</p>
+                    <hr style="margin: 20px 0;">
+                    <h3>Privacy Policy</h3>
+                    <p><strong>Effective Date: January 29, 2026</strong></p>
+                    <p>At How to K-Food, your privacy is important. We do not collect personal data directly.</p>
+                    <p>We use cookies and third-party vendors like Google AdSense to serve ads based on your prior visits.</p>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button id="google-photos-button">🔍 Google Photos</button>
-                <button id="youtube-videos-button">📺 YouTube Videos</button>
+        </div>
+
+        <div id="contact-modal" class="modal" style="display: none;">
+            <div class="modal-content" style="max-width: 680px; height: 90vh; overflow-y: auto;">
+                <span class="close-button contact-close-button">&times;</span>
+                <div class="modal-header"><h2 class="modal-name-en">Contact Us</h2></div>
+                <div class="modal-body contact-modal-body" style="text-align: center;">
+                    <p style="margin-bottom: 15px;">Have a question? Please fill out the form below!</p>
+                    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfWT7s-yoD-sAOp9nUhycTYk3lBMKK-5wvLyd05r4ecx_6ALw/viewform?embedded=true" width="100%" height="800" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+                </div>
             </div>
         </div>
     </div>
-    <div id="about-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <span class="close-button about-close-button">&times;</span>
-            <div class="modal-header"><h2 class="modal-name-en">About Us & Mission</h2></div>
-            <div class="modal-body about-modal-body">
-                <p>Welcome to <strong>How to K-Food</strong>! Our mission is to provide authentic guides to Korean cuisine.</p>
-                <p>We help you navigate Korean culinary etiquette and enjoy meals like a local.</p>
-            </div>
-        </div>
-    </div>
-    <div id="privacy-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <span class="close-button privacy-close-button">&times;</span>
-            <div class="modal-header"><h2 class="modal-name-en">Privacy Policy & Disclaimer</h2></div>
-            <div class="modal-body privacy-modal-body">
-                <h3 style="color: #d32f2f;">Disclaimer</h3>
-                <p>The content provided on this website is for informational and cultural purposes only. Please be aware of any food allergies you may have. We are not responsible for any adverse effects resulting from the consumption of foods listed here.</p>
-                <hr style="margin: 20px 0;">
-                <h3>Privacy Policy</h3>
-                <p><strong>Effective Date: January 29, 2026</strong></p>
-                <p>At How to K-Food, your privacy is important. We do not collect personal data directly.</p>
-                <p>We use cookies and third-party vendors like Google AdSense to serve ads based on your prior visits.</p>
-            </div>
-        </div>
-    </div>
-    <div id="contact-modal" class="modal" style="display: none;">
-        <div class="modal-content" style="max-width: 680px; height: 90vh; overflow-y: auto;">
-            <span class="close-button contact-close-button">&times;</span>
-            <div class="modal-header"><h2 class="modal-name-en">Contact Us</h2></div>
-            <div class="modal-body contact-modal-body" style="text-align: center;">
-                <p style="margin-bottom: 15px;">Have a question? Please fill out the form below!</p>
-                <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfWT7s-yoD-sAOp9nUhycTYk3lBMKK-5wvLyd05r4ecx_6ALw/viewform?embedded=true" width="100%" height="800" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
-            </div>
-        </div>
-    </div>
-</div>
-<script type="module" src="main.js"></script>
+    <script type="module" src="main.js"></script>
+</body>
+</html>
