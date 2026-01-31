@@ -25,6 +25,11 @@ const privacyPolicyButton = document.getElementById('privacy-policy-button');
 const privacyModal = document.getElementById('privacy-modal');
 const privacyCloseButton = privacyModal ? privacyModal.querySelector('.privacy-close-button') : null;
 
+// Added for Contact Modal
+const contactUsButton = document.getElementById('contact-us-button');
+const contactModal = document.getElementById('contact-modal');
+const contactCloseButton = contactModal ? contactModal.querySelector('.contact-close-button') : null;
+
 // Ensure modal is hidden immediately when script starts, overriding any potential initial display issues.
 if (foodModal) {
     foodModal.style.display = 'none';
@@ -36,6 +41,10 @@ if (aboutModal) {
 // Added for privacyModal
 if (privacyModal) {
     privacyModal.style.display = 'none';
+}
+// Added for contactModal
+if (contactModal) {
+    contactModal.style.display = 'none';
 }
 
 let currentFoods = [...foods]; // To hold the currently filtered/searched foods
@@ -254,6 +263,37 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
+// --- Contact Modal Logic ---
+const contactUsButton = document.getElementById('contact-us-button');
+const contactModal = document.getElementById('contact-modal');
+const contactCloseButton = contactModal ? contactModal.querySelector('.contact-close-button') : null;
+
+function openContactModal() {
+if (contactModal) {
+contactModal.style.display = 'flex'; // 보이게 설정
+contactModal.classList.add('active');
+document.body.style.overflow = 'hidden'; // 스크롤 막기
+}
+}
+function closeContactModal() {
+if (contactModal) {
+contactModal.style.display = 'none'; // 안 보이게 설정
+contactModal.classList.remove('active');
+document.body.style.overflow = ''; // 스크롤 풀기
+}
+}
+// 이벤트 연결
+if (contactUsButton) contactUsButton.addEventListener('click', openContactModal);
+if (contactCloseButton) contactCloseButton.addEventListener('click', closeContactModal);
+// 배경 클릭 시 닫기
+if (contactModal) {
+contactModal.addEventListener('click', (event) => {
+if (event.target === contactModal) {
+closeContactModal();
+}
+});
+}
+
 
 // --- Initial Load ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -268,6 +308,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Added for privacyModal
     if (privacyModal) {
         privacyModal.style.display = 'none';
+    }
+    // Added for contactModal
+    if (contactModal) {
+        contactModal.style.display = 'none';
     }
 
     // Only render if elements exist
