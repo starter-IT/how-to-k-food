@@ -1,11 +1,27 @@
 import foods from './foods.js';
 
-// Get DOM elements
+// 1. Get DOM elements
 const foodListElement = document.getElementById('food-list');
 const searchBar = document.getElementById('search-bar');
 const categoryFiltersElement = document.getElementById('category-filters');
+
+// Modals
 const foodModal = document.getElementById('food-modal');
-const closeButton = foodModal ? foodModal.querySelector('.close-button') : null; // Added null check
+const modalCloseBtn = foodModal ? foodModal.querySelector('.close-button') : null;
+
+const aboutModal = document.getElementById('about-modal');
+const aboutUsBtn = document.getElementById('about-us-button');
+const aboutCloseBtn = aboutModal ? aboutModal.querySelector('.about-close-button') : null;
+
+const privacyModal = document.getElementById('privacy-modal');
+const privacyBtn = document.getElementById('privacy-policy-button');
+const privacyCloseBtn = privacyModal ? privacyModal.querySelector('.privacy-close-button') : null;
+
+const contactModal = document.getElementById('contact-modal');
+const contactBtn = document.getElementById('contact-us-button');
+const contactCloseBtn = contactModal ? contactModal.querySelector('.contact-close-button') : null;
+
+// Modal Content Elements
 const modalEmoji = document.getElementById('modal-emoji');
 const modalNameEn = document.getElementById('modal-name-en');
 const modalNameKo = document.getElementById('modal-name-ko');
@@ -15,306 +31,120 @@ const modalTip = document.getElementById('modal-tip');
 const googlePhotosButton = document.getElementById('google-photos-button');
 const youtubeVideosButton = document.getElementById('youtube-videos-button');
 
-// Added for About Modal
-const aboutUsButton = document.getElementById('about-us-button');
-const aboutModal = document.getElementById('about-modal');
-const aboutCloseButton = aboutModal ? aboutModal.querySelector('.about-close-button') : null;
-
-// Added for Privacy Modal
-const privacyPolicyButton = document.getElementById('privacy-policy-button');
-const privacyModal = document.getElementById('privacy-modal');
-const privacyCloseButton = privacyModal ? privacyModal.querySelector('.privacy-close-button') : null;
-
-// Added for Contact Modal
-const contactUsButton = document.getElementById('contact-us-button');
-const contactModal = document.getElementById('contact-modal');
-const contactCloseButton = contactModal ? contactModal.querySelector('.contact-close-button') : null;
-
-// Ensure modal is hidden immediately when script starts, overriding any potential initial display issues.
-if (foodModal) {
-    foodModal.style.display = 'none';
-}
-// Added for aboutModal
-if (aboutModal) {
-    aboutModal.style.display = 'none';
-}
-// Added for privacyModal
-if (privacyModal) {
-    privacyModal.style.display = 'none';
-}
-// Added for contactModal
-if (contactModal) {
-    contactModal.style.display = 'none';
+// 2. Helper Functions
+function closeAllModals() {
+    [foodModal, aboutModal, privacyModal, contactModal].forEach(modal => {
+        if (modal) {
+            modal.style.display = 'none';
+            modal.classList.remove('active');
+        }
+    });
+    document.body.style.overflow = '';
 }
 
-let currentFoods = [...foods]; // To hold the currently filtered/searched foods
+function openModal(modal) {
+    if (!modal) return;
+    closeAllModals(); // Close others first
+    modal.style.display = 'flex';
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
 
-// --- Rendering Functions ---
-
-// Renders all food cards
+// 3. Render Functions
 function renderFoodCards(foodArray) {
-    foodListElement.innerHTML = ''; // Clear existing cards
+    foodListElement.innerHTML = '';
     if (foodArray.length === 0) {
-        foodListElement.innerHTML = '<p class="no-results">No K-Food found matching your criteria.</p>';
+        foodListElement.innerHTML = 'No K-Food found matching your criteria.';
         return;
     }
     foodArray.forEach(food => {
         const foodCard = document.createElement('article');
         foodCard.classList.add('food-card');
-        foodCard.dataset.id = food.id; // Store food ID for modal lookup
-
-        foodCard.innerHTML = `
-            <div class="food-card-emoji">${food.emoji}</div>
-            <div class="food-card-name-en">${food.name}</div>
-            <div class="food-card-name-ko">${food.koreanName}</div>
-        `;
-        foodCard.addEventListener('click', () => openFoodModal(food.id));
+        foodCard.innerHTML = `<div class="food-card-emoji">${food.emoji}</div> <div class="food-card-name-en">${food.name}</div> <div class="food-card-name-ko">${food.koreanName}</div>`;
+        foodCard.addEventListener('click', () => openFoodModal(food));
         foodListElement.appendChild(foodCard);
     });
 }
 
-// Generates and renders category filter buttons
-function renderCategoryFilters() {
-    const categories = ['All', ...new Set(foods.map(food => food.category))]; // Get unique categories
-    categoryFiltersElement.innerHTML = '';
-
-    categories.forEach(category => {
-        const button = document.createElement('button');
-        button.classList.add('category-filter-btn');
-        button.textContent = category;
-        button.dataset.category = category;
-        if (category === 'All') {
-            button.classList.add('active'); // 'All' is active by default
-        }
-        button.addEventListener('click', () => filterByCategory(category));
-        categoryFiltersElement.appendChild(button);
-    });
-}
-
-// --- Filtering and Searching Logic ---
-
-let activeCategory = 'All'; // Track active category
-
-function filterAndSearchFoods() {
-    let filtered = [...foods];
-
-    // Apply category filter
-    if (activeCategory !== 'All') {
-        filtered = filtered.filter(food => food.category === activeCategory);
-    }
-
-    // Apply search filter
-    const searchTerm = searchBar.value.toLowerCase().trim();
-    if (searchTerm) {
-        filtered = filtered.filter(food =>
-            food.name.toLowerCase().includes(searchTerm) ||
-            food.koreanName.toLowerCase().includes(searchTerm) ||
-            food.category.toLowerCase().includes(searchTerm) ||
-            food.howToEat.toLowerCase().includes(searchTerm) ||
-            food.dont.toLowerCase().includes(searchTerm) ||
-            food.tip.toLowerCase().includes(searchTerm)
-        );
-    }
-    currentFoods = filtered;
-    renderFoodCards(currentFoods);
-}
-
-function filterByCategory(category) {
-    // Update active category button styling
-    document.querySelectorAll('.category-filter-btn').forEach(button => {
-        button.classList.remove('active');
-    });
-    const targetButton = document.querySelector(`.category-filter-btn[data-category="${category}"]`);
-    if (targetButton) { // Added null check
-        targetButton.classList.add('active');
-    }
-
-    activeCategory = category;
-    filterAndSearchFoods();
-}
-
-// --- Modal Functions ---
-
-function openFoodModal(foodId) {
-    const food = foods.find(f => f.id === foodId);
-    if (!food) return;
-
+function openFoodModal(food) {
     if (modalEmoji) modalEmoji.textContent = food.emoji;
     if (modalNameEn) modalNameEn.textContent = food.name;
     if (modalNameKo) modalNameKo.textContent = food.koreanName;
     if (modalHowToEat) modalHowToEat.textContent = food.howToEat;
     if (modalDont) modalDont.textContent = food.dont;
     if (modalTip) modalTip.textContent = food.tip;
-
-    // Set up external links
     if (googlePhotosButton) googlePhotosButton.onclick = () => window.open(`https://www.google.com/search?tbm=isch&q=${encodeURIComponent('Korean food ' + food.name)}`, '_blank');
     if (youtubeVideosButton) youtubeVideosButton.onclick = () => window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent('Korean food ' + food.name)}`, '_blank');
-
-    if (foodModal) {
-        foodModal.style.display = 'flex'; // Use flex to center, matches CSS active class
-        foodModal.classList.add('active');
-    }
-    document.body.style.overflow = 'hidden'; // Prevent scrolling on body when modal is open
+    openModal(foodModal);
 }
 
-function closeFoodModal() {
-    if (foodModal) {
-        foodModal.classList.remove('active');
-        foodModal.style.display = 'none'; // Ensure it's hidden explicitly
-    }
-    document.body.style.overflow = ''; // Restore scrolling on body
+function renderCategoryFilters() {
+    const categories = ['All', ...new Set(foods.map(food => food.category))];
+    categoryFiltersElement.innerHTML = '';
+
+    categories.forEach(category => {
+        const button = document.createElement('button');
+        button.classList.add('category-filter-btn');
+        button.textContent = category;
+        if (category === 'All') button.classList.add('active');
+        button.addEventListener('click', () => filterByCategory(category));
+        categoryFiltersElement.appendChild(button);
+    });
 }
 
-// --- About Modal Functions ---
+let activeCategory = 'All';
 
-function openAboutModal() {
-    // If food modal is open, close it first to ensure only one modal is active
-    if (foodModal && foodModal.classList.contains('active')) {
-        closeFoodModal();
-    }
-    if (aboutModal) {
-        aboutModal.style.display = 'flex';
-        aboutModal.classList.add('active');
-    }
-    document.body.style.overflow = 'hidden';
+function filterByCategory(category) {
+    document.querySelectorAll('.category-filter-btn').forEach(btn => btn.classList.remove('active'));
+    const targetBtn = document.querySelector(`.category-filter-btn[data-category="${category}"]`);
+    if (targetBtn) targetBtn.classList.add('active');
+    activeCategory = category;
+    filterAndSearchFoods();
 }
 
-function closeAboutModal() {
-    if (aboutModal) {
-        aboutModal.classList.remove('active');
-        aboutModal.style.display = 'none';
+function filterAndSearchFoods() {
+    let filtered = [...foods];
+    if (activeCategory !== 'All') filtered = filtered.filter(f => f.category === activeCategory);
+    const term = searchBar.value.toLowerCase().trim();
+    if (term) {
+        filtered = filtered.filter(f =>
+            f.name.toLowerCase().includes(term) ||
+            f.koreanName.toLowerCase().includes(term) ||
+            f.category.toLowerCase().includes(term)
+        );
     }
-    document.body.style.overflow = '';
+    renderFoodCards(filtered);
 }
 
-// --- Privacy Modal Functions ---
-
-function openPrivacyModal() {
-    // If food modal is open, close it first
-    if (foodModal && foodModal.classList.contains('active')) {
-        closeFoodModal();
-    }
-    // If about modal is open, close it first
-    if (aboutModal && aboutModal.classList.contains('active')) {
-        closeAboutModal();
-    }
-    if (privacyModal) {
-        privacyModal.style.display = 'flex';
-        privacyModal.classList.add('active');
-    }
-    document.body.style.overflow = 'hidden';
-}
-
-function closePrivacyModal() {
-    if (privacyModal) {
-        privacyModal.classList.remove('active');
-        privacyModal.style.display = 'none';
-    }
-    document.body.style.overflow = '';
-}
-
-// --- Event Listeners ---
+// 4. Event Listeners
 if (searchBar) searchBar.addEventListener('input', filterAndSearchFoods);
-if (closeButton) closeButton.addEventListener('click', closeFoodModal);
-if (foodModal) {
-    foodModal.addEventListener('click', (event) => {
-        if (event.target === foodModal) { // Close when clicking outside the modal content
-            closeFoodModal();
-        }
-    });
-}
-document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && foodModal && foodModal.classList.contains('active')) {
-        closeFoodModal();
+
+// Open Buttons
+if (aboutUsBtn) aboutUsBtn.addEventListener('click', () => openModal(aboutModal));
+if (privacyBtn) privacyBtn.addEventListener('click', () => openModal(privacyModal));
+if (contactBtn) contactBtn.addEventListener('click', () => openModal(contactModal));
+
+// Close Buttons
+if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeAllModals);
+if (aboutCloseBtn) aboutCloseBtn.addEventListener('click', closeAllModals);
+if (privacyCloseBtn) privacyCloseBtn.addEventListener('click', closeAllModals);
+if (contactCloseBtn) contactCloseBtn.addEventListener('click', closeAllModals);
+
+// Close on Background Click & ESC
+[foodModal, aboutModal, privacyModal, contactModal].forEach(modal => {
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeAllModals();
+        });
     }
 });
-
-// --- Event Listeners for About Modal ---
-if (aboutUsButton) aboutUsButton.addEventListener('click', openAboutModal);
-if (aboutCloseButton) aboutCloseButton.addEventListener('click', closeAboutModal);
-if (aboutModal) {
-    aboutModal.addEventListener('click', (event) => {
-        if (event.target === aboutModal) {
-            closeAboutModal();
-        }
-    });
-}
-document.addEventListener('keydown', (event) => {
-    // Check if aboutModal is active, and foodModal is NOT active, to avoid conflict
-    if (event.key === 'Escape' && aboutModal && aboutModal.classList.contains('active') && !(foodModal && foodModal.classList.contains('active'))) {
-        closeAboutModal();
-    }
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeAllModals();
 });
 
-// --- Event Listeners for Privacy Modal ---
-if (privacyPolicyButton) privacyPolicyButton.addEventListener('click', openPrivacyModal);
-if (privacyCloseButton) privacyCloseButton.addEventListener('click', closePrivacyModal);
-if (privacyModal) {
-    privacyModal.addEventListener('click', (event) => {
-        if (event.target === privacyModal) {
-            closePrivacyModal();
-        }
-    });
-}
-document.addEventListener('keydown', (event) => {
-    // Check if privacyModal is active, and other modals are NOT, to avoid conflict
-    if (event.key === 'Escape' && privacyModal && privacyModal.classList.contains('active') && !(foodModal && foodModal.classList.contains('active')) && !(aboutModal && aboutModal.classList.contains('active'))) {
-        closePrivacyModal();
-    }
-});
-
-// --- Contact Modal Logic ---
-const contactUsButton = document.getElementById('contact-us-button');
-const contactModal = document.getElementById('contact-modal');
-const contactCloseButton = contactModal ? contactModal.querySelector('.contact-close-button') : null;
-
-function openContactModal() {
-if (contactModal) {
-contactModal.style.display = 'flex'; // 보이게 설정
-contactModal.classList.add('active');
-document.body.style.overflow = 'hidden'; // 스크롤 막기
-}
-}
-function closeContactModal() {
-if (contactModal) {
-contactModal.style.display = 'none'; // 안 보이게 설정
-contactModal.classList.remove('active');
-document.body.style.overflow = ''; // 스크롤 풀기
-}
-}
-// 이벤트 연결
-if (contactUsButton) contactUsButton.addEventListener('click', openContactModal);
-if (contactCloseButton) contactCloseButton.addEventListener('click', closeContactModal);
-// 배경 클릭 시 닫기
-if (contactModal) {
-contactModal.addEventListener('click', (event) => {
-if (event.target === contactModal) {
-closeContactModal();
-}
-});
-}
-
-
-// --- Initial Load ---
+// 5. Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    // As a double check, ensure modal is hidden on DOMContentLoaded too
-    if (foodModal) {
-        foodModal.style.display = 'none';
-    }
-    // Added for aboutModal
-    if (aboutModal) {
-        aboutModal.style.display = 'none';
-    }
-    // Added for privacyModal
-    if (privacyModal) {
-        privacyModal.style.display = 'none';
-    }
-    // Added for contactModal
-    if (contactModal) {
-        contactModal.style.display = 'none';
-    }
-
-    // Only render if elements exist
-    if (categoryFiltersElement) renderCategoryFilters();
-    if (foodListElement) renderFoodCards(foods); // Render all foods initially
+    closeAllModals(); // Ensure all hidden on load
+    renderCategoryFilters();
+    renderFoodCards(foods);
 });
